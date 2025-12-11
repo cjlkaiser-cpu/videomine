@@ -217,6 +217,45 @@ def main():
             print("Uso: --finish VIDEO_ID")
             return
 
+    # Comando --map (extraer conceptos de un video)
+    if "--map" in sys.argv:
+        import cartographer
+        idx = sys.argv.index("--map")
+        if idx + 1 < len(sys.argv):
+            video_id = sys.argv[idx + 1]
+            print(f"🗺️  Mapeando conceptos de {video_id}...")
+            try:
+                extraction = cartographer.map_video(video_id)
+                print(f"   ✅ {len(extraction['concepts'])} conceptos extraídos")
+                print(f"   ✅ {len(extraction['relations'])} relaciones")
+            except Exception as e:
+                print(f"   ❌ Error: {e}")
+            return
+        else:
+            print("Uso: --map VIDEO_ID")
+            return
+
+    # Comando --rebuild-graph (reconstruir grafo completo)
+    if "--rebuild-graph" in sys.argv:
+        import cartographer
+        print("🗺️  Reconstruyendo grafo de conocimiento...")
+        try:
+            stats = cartographer.rebuild()
+            print(f"   ✅ {stats['concepts']} conceptos")
+            print(f"   ✅ {stats['relations']} relaciones")
+            print(f"   ✅ {stats['videos']} videos procesados")
+        except Exception as e:
+            print(f"   ❌ Error: {e}")
+        return
+
+    # Comando --graph (abrir grafo en navegador)
+    if "--graph" in sys.argv:
+        import webbrowser
+        url = f"http://localhost:5555/vault/graph"
+        print(f"🗺️  Abriendo grafo: {url}")
+        webbrowser.open(url)
+        return
+
     # Filtrar argumentos
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
 
@@ -240,6 +279,9 @@ Opciones:
   --finish ID       Completar video pendiente con resumen JSON
   --delete ID       Eliminar nugget del vault
   --server          Iniciar interfaz web (Compass)
+  --map ID          Extraer conceptos de un video al grafo
+  --rebuild-graph   Reconstruir grafo completo desde todos los nuggets
+  --graph           Abrir vista del grafo en navegador
 
 Ejemplos:
   python videomine.py 'URL'                   # Usa Ollama (local)

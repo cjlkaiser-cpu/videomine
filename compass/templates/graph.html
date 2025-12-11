@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Graph - VideoMine</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            overflow: hidden;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(26, 26, 46, 0.95);
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+            color: #ffa500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-box {
+            background: #2a2a4e;
+            border: 1px solid #444;
+            border-radius: 20px;
+            padding: 8px 15px;
+            color: #fff;
+            width: 250px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #ffa500;
+        }
+
+        .btn {
+            background: #ffa500;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #ff8c00;
+        }
+
+        .btn-secondary {
+            background: #333;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #444;
+        }
+
+        #graph-container {
+            width: 100vw;
+            height: 100vh;
+            padding-top: 60px;
+        }
+
+        #graph {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Nodos */
+        .node circle {
+            stroke: #fff;
+            stroke-width: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .node:hover circle {
+            stroke-width: 3px;
+            filter: brightness(1.2);
+        }
+
+        .node text {
+            font-size: 11px;
+            fill: #fff;
+            pointer-events: none;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        /* Enlaces */
+        .link {
+            fill: none;
+            stroke-opacity: 0.6;
+        }
+
+        .link-label {
+            font-size: 9px;
+            fill: #888;
+            pointer-events: none;
+        }
+
+        /* Panel lateral */
+        .side-panel {
+            position: fixed;
+            top: 60px;
+            right: -400px;
+            width: 400px;
+            height: calc(100vh - 60px);
+            background: rgba(26, 26, 46, 0.98);
+            border-left: 1px solid #333;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            z-index: 99;
+        }
+
+        .side-panel.open {
+            right: 0;
+        }
+
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            color: #ffa500;
+            font-size: 1.1rem;
+        }
+
+        .close-panel {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .close-panel:hover {
+            color: #fff;
+        }
+
+        .panel-content {
+            padding: 20px;
+        }
+
+        .concept-type {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-bottom: 15px;
+        }
+
+        .type-concepto { background: #4a9eff; }
+        .type-herramienta { background: #ff6b6b; }
+        .type-lenguaje { background: #51cf66; }
+        .type-libreria { background: #ffd43b; color: #000; }
+        .type-framework { background: #be4bdb; }
+        .type-metodologia { background: #20c997; }
+        .type-patron { background: #f783ac; }
+
+        .panel-section {
+            margin-bottom: 20px;
+        }
+
+        .panel-section h3 {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .video-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #2a2a4e;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            text-decoration: none;
+            color: #fff;
+            transition: background 0.2s;
+        }
+
+        .video-link:hover {
+            background: #3a3a5e;
+        }
+
+        .video-link img {
+            width: 60px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .video-link span {
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+
+        .related-concept {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #333;
+            border-radius: 15px;
+            margin: 3px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .related-concept:hover {
+            background: #ffa500;
+            color: #000;
+        }
+
+        /* Stats */
+        .stats {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(26, 26, 46, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .stats strong {
+            color: #ffa500;
+        }
+
+        /* Leyenda */
+        .legend {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(26, 26, 46, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #333;
+            border-top-color: #ffa500;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty state */
+        .empty-state {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #666;
+        }
+
+        .empty-state h2 {
+            color: #ffa500;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>
+            <span>🗺️</span>
+            <span>Knowledge Graph</span>
+        </h1>
+        <div class="header-controls">
+            <input type="text" class="search-box" id="search" placeholder="Buscar concepto...">
+            <button class="btn btn-secondary" onclick="resetZoom()">Reset</button>
+            <button class="btn" onclick="rebuildGraph()">Reconstruir</button>
+            <a href="/" class="btn btn-secondary">← Vault</a>
+        </div>
+    </div>
+
+    <div id="graph-container">
+        <svg id="graph"></svg>
+    </div>
+
+    <div class="side-panel" id="panel">
+        <div class="panel-header">
+            <h2 id="panel-title">Concepto</h2>
+            <button class="close-panel" onclick="closePanel()">×</button>
+        </div>
+        <div class="panel-content" id="panel-content">
+        </div>
+    </div>
+
+    <div class="stats" id="stats">
+        Cargando...
+    </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background: #4a9eff"></div>
+            <span>Concepto</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #51cf66"></div>
+            <span>Lenguaje</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ffd43b"></div>
+            <span>Libreria</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #be4bdb"></div>
+            <span>Framework</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ff6b6b"></div>
+            <span>Herramienta</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #20c997"></div>
+            <span>Metodologia</span>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <p style="margin-top: 15px; color: #888">Cargando grafo...</p>
+    </div>
+
+    <div class="empty-state" id="empty" style="display: none">
+        <h2>Grafo vacio</h2>
+        <p>No hay conceptos extraidos todavia.</p>
+        <button class="btn" style="margin-top: 20px" onclick="rebuildGraph()">
+            Construir grafo
+        </button>
+    </div>
+
+    <script>
+        const typeColors = {
+            'concepto': '#4a9eff',
+            'lenguaje': '#51cf66',
+            'libreria': '#ffd43b',
+            'framework': '#be4bdb',
+            'herramienta': '#ff6b6b',
+            'metodologia': '#20c997',
+            'patron': '#f783ac'
+        };
+
+        let svg, simulation, g, zoom;
+        let graphData = { nodes: [], links: [] };
+
+        async function loadGraph() {
+            try {
+                const response = await fetch('/api/cartographer/graph');
+                const data = await response.json();
+
+                document.getElementById('loading').style.display = 'none';
+
+                if (!data.nodes || data.nodes.length === 0) {
+                    document.getElementById('empty').style.display = 'block';
+                    document.getElementById('stats').innerHTML = '<strong>0</strong> conceptos';
+                    return;
+                }
+
+                graphData = data;
+                renderGraph(data);
+
+                document.getElementById('stats').innerHTML =
+                    `<strong>${data.nodes.length}</strong> conceptos · <strong>${data.links.length}</strong> conexiones`;
+            } catch (error) {
+                console.error('Error loading graph:', error);
+                document.getElementById('loading').innerHTML =
+                    '<p style="color: #ff6b6b">Error cargando el grafo</p>';
+            }
+        }
+
+        function renderGraph(data) {
+            const container = document.getElementById('graph-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight - 60;
+
+            svg = d3.select('#graph')
+                .attr('width', width)
+                .attr('height', height);
+
+            svg.selectAll('*').remove();
+
+            // Zoom
+            zoom = d3.zoom()
+                .scaleExtent([0.1, 4])
+                .on('zoom', (event) => {
+                    g.attr('transform', event.transform);
+                });
+
+            svg.call(zoom);
+
+            g = svg.append('g');
+
+            // Definir marcadores de flecha
+            svg.append('defs').append('marker')
+                .attr('id', 'arrowhead')
+                .attr('viewBox', '-0 -5 10 10')
+                .attr('refX', 20)
+                .attr('refY', 0)
+                .attr('orient', 'auto')
+                .attr('markerWidth', 6)
+                .attr('markerHeight', 6)
+                .append('path')
+                .attr('d', 'M 0,-5 L 10,0 L 0,5')
+                .attr('fill', '#666');
+
+            // Simulacion de fuerzas
+            simulation = d3.forceSimulation(data.nodes)
+                .force('link', d3.forceLink(data.links)
+                    .id(d => d.id)
+                    .distance(d => 100 / (d.strength || 0.5))
+                )
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(40));
+
+            // Enlaces
+            const link = g.append('g')
+                .selectAll('line')
+                .data(data.links)
+                .enter()
+                .append('line')
+                .attr('class', 'link')
+                .attr('stroke', '#555')
+                .attr('stroke-width', d => (d.strength || 0.5) * 3)
+                .attr('marker-end', 'url(#arrowhead)');
+
+            // Nodos
+            const node = g.append('g')
+                .selectAll('.node')
+                .data(data.nodes)
+                .enter()
+                .append('g')
+                .attr('class', 'node')
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended)
+                )
+                .on('click', (event, d) => showConceptPanel(d));
+
+            node.append('circle')
+                .attr('r', d => 8 + (d.size || 1) * 4)
+                .attr('fill', d => typeColors[d.type] || typeColors['concepto']);
+
+            node.append('text')
+                .attr('dx', d => 12 + (d.size || 1) * 4)
+                .attr('dy', 4)
+                .text(d => d.id.length > 20 ? d.id.substring(0, 18) + '...' : d.id);
+
+            // Actualizar posiciones
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                node.attr('transform', d => `translate(${d.x},${d.y})`);
+            });
+
+            // Centrar vista inicial
+            setTimeout(() => {
+                const bounds = g.node().getBBox();
+                const scale = 0.8 / Math.max(bounds.width / width, bounds.height / height);
+                const tx = width / 2 - scale * (bounds.x + bounds.width / 2);
+                const ty = height / 2 - scale * (bounds.y + bounds.height / 2);
+
+                svg.transition()
+                    .duration(750)
+                    .call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+            }, 1000);
+        }
+
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
+        async function showConceptPanel(node) {
+            const panel = document.getElementById('panel');
+            const title = document.getElementById('panel-title');
+            const content = document.getElementById('panel-content');
+
+            title.textContent = node.id;
+            content.innerHTML = '<p style="color: #888">Cargando...</p>';
+            panel.classList.add('open');
+
+            try {
+                const response = await fetch(`/api/cartographer/concept/${encodeURIComponent(node.id)}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    content.innerHTML = `<p style="color: #ff6b6b">${data.error}</p>`;
+                    return;
+                }
+
+                let html = `
+                    <span class="concept-type type-${data.type}">${data.type}</span>
+                `;
+
+                if (data.aliases && data.aliases.length > 0) {
+                    html += `
+                        <div class="panel-section">
+                            <h3>Aliases</h3>
+                            <p style="color: #888">${data.aliases.join(', ')}</p>
+                        </div>
+                    `;
+                }
+
+                if (data.sources && data.sources.length > 0) {
+                    html += `<div class="panel-section"><h3>Videos (${data.sources.length})</h3>`;
+
+                    // Obtener info de videos
+                    const videosResponse = await fetch('/api/videos');
+                    const videos = await videosResponse.json();
+                    const videoMap = {};
+                    videos.forEach(v => videoMap[v.id] = v);
+
+                    for (const videoId of data.sources) {
+                        const video = videoMap[videoId];
+                        if (video) {
+                            html += `
+                                <a href="/${video.file}" class="video-link">
+                                    <img src="${video.thumbnail}" alt="">
+                                    <span>${video.title.substring(0, 50)}${video.title.length > 50 ? '...' : ''}</span>
+                                </a>
+                            `;
+                        }
+                    }
+                    html += '</div>';
+                }
+
+                if (data.related && data.related.length > 0) {
+                    html += `<div class="panel-section"><h3>Conceptos relacionados</h3>`;
+                    for (const rel of data.related) {
+                        html += `
+                            <span class="related-concept" onclick="focusNode('${rel.name}')">
+                                ${rel.name}
+                            </span>
+                        `;
+                    }
+                    html += '</div>';
+                }
+
+                content.innerHTML = html;
+
+            } catch (error) {
+                content.innerHTML = `<p style="color: #ff6b6b">Error: ${error.message}</p>`;
+            }
+        }
+
+        function closePanel() {
+            document.getElementById('panel').classList.remove('open');
+        }
+
+        function focusNode(name) {
+            const node = graphData.nodes.find(n => n.id === name);
+            if (node && svg && zoom) {
+                const container = document.getElementById('graph-container');
+                const width = container.clientWidth;
+                const height = container.clientHeight - 60;
+
+                svg.transition()
+                    .duration(750)
+                    .call(zoom.transform, d3.zoomIdentity
+                        .translate(width / 2, height / 2)
+                        .scale(1.5)
+                        .translate(-node.x, -node.y)
+                    );
+
+                showConceptPanel(node);
+            }
+        }
+
+        function resetZoom() {
+            if (svg && zoom) {
+                const container = document.getElementById('graph-container');
+                const width = container.clientWidth;
+                const height = container.clientHeight - 60;
+
+                svg.transition()
+                    .duration(750)
+                    .call(zoom.transform, d3.zoomIdentity
+                        .translate(width / 2, height / 2)
+                        .scale(0.8)
+                    );
+            }
+        }
+
+        async function rebuildGraph() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Procesando...';
+
+            try {
+                const response = await fetch('/api/cartographer/rebuild', { method: 'POST' });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`Grafo reconstruido: ${data.concepts} conceptos, ${data.relations} relaciones`);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Reconstruir';
+            }
+        }
+
+        // Busqueda
+        document.getElementById('search').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+
+            if (!query) {
+                d3.selectAll('.node').style('opacity', 1);
+                d3.selectAll('.link').style('opacity', 0.6);
+                return;
+            }
+
+            d3.selectAll('.node').style('opacity', d =>
+                d.id.toLowerCase().includes(query) ? 1 : 0.2
+            );
+
+            const matchingIds = new Set(
+                graphData.nodes
+                    .filter(n => n.id.toLowerCase().includes(query))
+                    .map(n => n.id)
+            );
+
+            d3.selectAll('.link').style('opacity', d =>
+                matchingIds.has(d.source.id) || matchingIds.has(d.target.id) ? 0.6 : 0.1
+            );
+        });
+
+        // Atajos de teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closePanel();
+            }
+        });
+
+        // Inicializar
+        loadGraph();
+    </script>
+</body>
+</html>

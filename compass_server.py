@@ -28,6 +28,7 @@ from tunnel import scan_video, extract_subtitles, transcribe_audio
 from gemcutter import cut_with_ollama, cut_with_claude_code, parse_nugget
 from vault import load_nuggets, save_nugget, forge_html, forge_index, delete_nugget
 from pickaxe import format_duration, get_safe_filename
+import cartographer
 
 app = Flask(__name__, static_folder='vault')
 CORS(app, origins=['http://localhost:5555', 'http://127.0.0.1:5555'])
@@ -859,6 +860,80 @@ Reglas:
         return jsonify({"error": "Timeout - el LLM tardó demasiado"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# ============================================
+# CARTOGRAPHER - Grafo de Conocimiento
+# ============================================
+
+@app.route('/api/cartographer/graph', methods=['GET'])
+def get_knowledge_graph():
+    """Obtiene el grafo de conocimiento en formato D3.js."""
+    try:
+        data = cartographer.get_graph_data()
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e), "nodes": [], "links": []}), 500
+
+
+@app.route('/api/cartographer/rebuild', methods=['POST'])
+def rebuild_knowledge_graph():
+    """Reconstruye el grafo completo desde todos los nuggets."""
+    try:
+        stats = cartographer.rebuild()
+        return jsonify({"success": True, **stats})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/cartographer/extract/<video_id>', methods=['POST'])
+def extract_video_concepts(video_id):
+    """Extrae conceptos de un video y los agrega al grafo."""
+    try:
+        extraction = cartographer.map_video(video_id)
+        return jsonify({
+            "success": True,
+            "concepts": len(extraction.get('concepts', [])),
+            "relations": len(extraction.get('relations', []))
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/cartographer/concept/<name>', methods=['GET'])
+def get_concept_info(name):
+    """Obtiene información de un concepto específico."""
+    try:
+        info = cartographer.get_concept(name)
+        if info:
+            return jsonify(info)
+        return jsonify({"error": "Concepto no encontrado"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/cartographer/related/<video_id>', methods=['GET'])
+def get_related_videos(video_id):
+    """Obtiene videos relacionados por conceptos compartidos."""
+    try:
+        related = cartographer.get_related(video_id)
+        # Enriquecer con títulos
+        nuggets = load_nuggets()
+        nugget_map = {n['id']: n for n in nuggets}
+        for item in related:
+            nugget = nugget_map.get(item['video_id'], {})
+            item['title'] = nugget.get('title', 'Sin título')
+            item['thumbnail'] = nugget.get('thumbnail', '')
+            item['file'] = nugget.get('file', '')
+        return jsonify(related)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/vault/graph')
+def knowledge_graph_view():
+    """Sirve la página del grafo de conocimiento."""
+    return send_from_directory(TEMPLATE_DIR, 'graph.html')
 
 
 @app.route('/api/expand', methods=['POST'])
