@@ -19,6 +19,7 @@
 🏛️  Vault       → vault/__init__.py      (almacena nuggets)
 🧭 Compass     → compass_server.py       (interfaz web Flask)
 🗺️  Cartographer → cartographer/          (grafo de conocimiento)
+🔬 Prospector  → cartographer/embeddings_lab.py (lab de embeddings)
 ```
 
 ## Estructura
@@ -32,15 +33,17 @@ videomine/
 ├── tunnel/               # Scanner
 ├── gemcutter/            # Clasificador LLM
 ├── cartographer/         # Grafo de conocimiento
-│   ├── __init__.py       # API pública
+│   ├── __init__.py       # API publica
 │   ├── extractor.py      # Extrae conceptos con Claude Code
-│   └── graph.py          # KnowledgeGraph
+│   ├── graph.py          # KnowledgeGraph
+│   └── embeddings_lab.py # Lab de embeddings (Prospector)
 ├── vault/                # DB + nuggets HTML
 │   ├── nuggets.json
 │   └── *.html
 ├── compass/templates/    # Templates Jinja2
-│   ├── index.html        # Índice del vault
-│   └── nugget.html       # Template de nugget (con mapa conceptual)
+│   ├── index.html        # Indice del vault
+│   ├── nugget.html       # Template de nugget (con mapa conceptual)
+│   └── lab.html          # Laboratorio de embeddings
 ├── mine                  # Wrapper script
 ├── VideoMine.command     # Launcher macOS
 ├── CHANGELOG.md          # Historial de cambios
@@ -103,6 +106,13 @@ python videomine.py --graph          # Abrir visualización
 | `/api/cartographer/extract/<id>` | POST | Extraer conceptos de un video |
 | `/api/cartographer/related/<id>` | GET | Videos relacionados |
 | `/vault/graph` | GET | Vista interactiva del grafo |
+| `/lab` | GET | Laboratorio de embeddings |
+| `/api/lab/concepts` | GET | Lista de conceptos del grafo |
+| `/api/lab/search` | POST | Busqueda semantica |
+| `/api/lab/similarity` | POST | Similitud entre conceptos |
+| `/api/lab/quiz` | GET | Nueva pregunta quiz |
+| `/api/lab/quiz/check` | POST | Verificar respuesta |
+| `/api/lab/visualization` | GET | Datos para grafico 2D |
 
 ## Contexto
 

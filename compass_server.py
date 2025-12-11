@@ -936,6 +936,115 @@ def knowledge_graph_view():
     return send_from_directory(TEMPLATE_DIR, 'graph.html')
 
 
+# ============================================
+# LABORATORIO DE EMBEDDINGS
+# ============================================
+
+# Importar módulo de embeddings (lazy para evitar errores si no existe)
+embeddings_lab = None
+
+def get_embeddings_lab():
+    """Lazy load del módulo de embeddings."""
+    global embeddings_lab
+    if embeddings_lab is None:
+        try:
+            from cartographer import embeddings_lab as lab
+            embeddings_lab = lab
+        except ImportError:
+            return None
+    return embeddings_lab
+
+
+@app.route('/lab')
+def lab_view():
+    """Sirve la página del laboratorio de embeddings."""
+    return send_from_directory(TEMPLATE_DIR, 'lab.html')
+
+
+@app.route('/api/lab/concepts', methods=['GET'])
+def lab_get_concepts():
+    """Obtiene lista de conceptos disponibles."""
+    lab = get_embeddings_lab()
+    if not lab:
+        return jsonify({"error": "Módulo de embeddings no disponible", "concepts": []})
+
+    concepts = lab.load_concepts()
+    return jsonify({"concepts": concepts})
+
+
+@app.route('/api/lab/search', methods=['POST'])
+def lab_semantic_search():
+    """Búsqueda semántica por significado."""
+    lab = get_embeddings_lab()
+    if not lab:
+        return jsonify({"error": "Módulo de embeddings no disponible"})
+
+    data = request.json
+    query = data.get('query', '').strip()
+
+    if not query:
+        return jsonify({"error": "Query requerida"}), 400
+
+    results = lab.semantic_search(query)
+    return jsonify({"results": results, "query": query})
+
+
+@app.route('/api/lab/similarity', methods=['POST'])
+def lab_compute_similarity():
+    """Calcula similitud entre dos conceptos."""
+    lab = get_embeddings_lab()
+    if not lab:
+        return jsonify({"error": "Módulo de embeddings no disponible"})
+
+    data = request.json
+    a = data.get('a', '').strip()
+    b = data.get('b', '').strip()
+
+    if not a or not b:
+        return jsonify({"error": "Se requieren dos conceptos"}), 400
+
+    result = lab.compute_similarity(a, b)
+    return jsonify(result)
+
+
+@app.route('/api/lab/quiz', methods=['GET'])
+def lab_get_quiz():
+    """Genera una pregunta de quiz."""
+    lab = get_embeddings_lab()
+    if not lab:
+        return jsonify({"error": "Módulo de embeddings no disponible"})
+
+    quiz = lab.generate_quiz_question()
+    return jsonify(quiz)
+
+
+@app.route('/api/lab/quiz/check', methods=['POST'])
+def lab_check_quiz():
+    """Verifica respuesta del quiz."""
+    lab = get_embeddings_lab()
+    if not lab:
+        return jsonify({"error": "Módulo de embeddings no disponible"})
+
+    data = request.json
+    base = data.get('base', '')
+    answer = data.get('answer', '')
+    correct = data.get('correct', '')
+
+    result = lab.check_quiz_answer(base, answer, correct)
+    return jsonify(result)
+
+
+@app.route('/api/lab/visualization', methods=['GET'])
+def lab_get_visualization():
+    """Obtiene datos para visualización 2D."""
+    lab = get_embeddings_lab()
+    if not lab:
+        return jsonify({"error": "Módulo de embeddings no disponible"})
+
+    data = lab.get_visualization_data()
+    return jsonify(data)
+
+
 @app.route('/api/expand', methods=['POST'])
 def expand_point():
     """Expande un punto clave usando Ollama."""

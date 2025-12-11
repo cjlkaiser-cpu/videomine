@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoMine - Technical Deep Dive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Glow Effects */
+        .glow-gold { box-shadow: 0 0 30px rgba(255, 165, 0, 0.3); }
+        .glow-blue { box-shadow: 0 0 30px rgba(59, 130, 246, 0.3); }
+        .glow-purple { box-shadow: 0 0 30px rgba(168, 85, 247, 0.3); }
+        .glow-emerald { box-shadow: 0 0 30px rgba(16, 185, 129, 0.3); }
+
+        /* Animated gradients */
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .animated-gradient {
+            background-size: 200% 200%;
+            animation: gradient-shift 8s ease infinite;
+        }
+
+        /* Pipeline animation */
+        @keyframes flow {
+            0% { transform: translateX(-100%); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0; }
+        }
+        .flow-particle {
+            animation: flow 3s ease-in-out infinite;
+        }
+
+        /* Pulse */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 165, 0, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(255, 165, 0, 0.8); }
+        }
+        .pulse-gold { animation: pulse-glow 2s ease-in-out infinite; }
+
+        /* Float animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .float { animation: float 3s ease-in-out infinite; }
+
+        /* Card hover */
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); }
+
+        /* Graph node animation */
+        @keyframes node-pulse {
+            0%, 100% { r: 8; }
+            50% { r: 12; }
+        }
+
+        /* Neon text */
+        .neon-gold {
+            text-shadow: 0 0 10px rgba(255, 165, 0, 0.8), 0 0 20px rgba(255, 165, 0, 0.5);
+        }
+
+        /* Pipeline connector */
+        .pipeline-connector {
+            background: linear-gradient(90deg, transparent, #ffa500, transparent);
+            height: 2px;
+        }
+
+        /* Code block styling */
+        .code-block {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid #334155;
+        }
+
+        /* Section divider */
+        .section-divider {
+            background: linear-gradient(90deg, transparent, #ffa500, transparent);
+            height: 1px;
+        }
+
+        /* Mini graph animation */
+        #mini-graph circle {
+            transition: all 0.3s ease;
+        }
+        #mini-graph circle:hover {
+            r: 12;
+            filter: brightness(1.3);
+        }
+
+        /* Scroll animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Step indicator */
+        .step-line {
+            background: linear-gradient(180deg, #ffa500 0%, #f59e0b 50%, #d97706 100%);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen">
+
+    <!-- Hero Section -->
+    <header class="relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-slate-950 to-purple-900/20"></div>
+        <div class="absolute inset-0">
+            <div class="absolute top-20 left-10 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="relative max-w-6xl mx-auto px-6 py-20">
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center gap-3 mb-6">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center glow-gold float">
+                        <span class="text-3xl">⛏️</span>
+                    </div>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-4">
+                    <span class="bg-gradient-to-r from-amber-400 via-orange-500 to-amber-400 bg-clip-text text-transparent animated-gradient">
+                        VideoMine
+                    </span>
+                </h1>
+                <p class="text-xl text-slate-400 mb-2">Technical Deep Dive</p>
+                <p class="text-amber-500 font-medium">v0.4.0 "Prospector"</p>
+            </div>
+
+            <!-- Hero Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                <div class="card-hover bg-slate-900/80 backdrop-blur border border-amber-500/30 rounded-2xl p-5 text-center glow-gold">
+                    <div class="text-3xl font-bold text-amber-400 mb-1">7</div>
+                    <div class="text-xs text-slate-400">Modulos minerOS</div>
+                </div>
+                <div class="card-hover bg-slate-900/80 backdrop-blur border border-blue-500/30 rounded-2xl p-5 text-center">
+                    <div class="text-3xl font-bold text-blue-400 mb-1">3</div>
+                    <div class="text-xs text-slate-400">Motores LLM</div>
+                </div>
+                <div class="card-hover bg-slate-900/80 backdrop-blur border border-purple-500/30 rounded-2xl p-5 text-center">
+                    <div class="text-3xl font-bold text-purple-400 mb-1">57</div>
+                    <div class="text-xs text-slate-400">Conceptos en Grafo</div>
+                </div>
+                <div class="card-hover bg-slate-900/80 backdrop-blur border border-emerald-500/30 rounded-2xl p-5 text-center">
+                    <div class="text-3xl font-bold text-emerald-400 mb-1">100%</div>
+                    <div class="text-xs text-slate-400">Local First</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-12">
+
+        <!-- Section: minerOS Philosophy -->
+        <section class="mb-20 reveal">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                    <i class="fa-solid fa-gem text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-white">Metodologia minerOS</h2>
+                    <p class="text-slate-400">De video crudo a pepitas de conocimiento</p>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-amber-900/20 to-orange-900/20 rounded-3xl border border-amber-500/30 p-8 mb-8">
+                <div class="text-center mb-8">
+                    <p class="text-2xl font-light text-amber-200 italic">"Minamos datos como se mina oro"</p>
+                    <p class="text-slate-500 mt-2">ORO - GEMAS - TESORO</p>
+                </div>
+
+                <!-- Pipeline Visual -->
+                <div class="relative">
+                    <!-- Flow particles background -->
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
+                            <div class="flow-particle w-20 h-full bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
+                        </div>
+                    </div>
+
+                    <!-- Pipeline Steps -->
+                    <div class="relative grid grid-cols-2 md:grid-cols-6 gap-4">
+                        <!-- Tunnel -->
+                        <div class="card-hover bg-slate-900/90 backdrop-blur rounded-2xl p-4 border border-slate-700 text-center group">
+                            <div class="w-14 h-14 mx-auto mb-3 rounded-xl bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="text-2xl">🔦</span>
+                            </div>
+                            <h3 class="font-bold text-amber-400 mb-1">Tunnel</h3>
+                            <p class="text-xs text-slate-500">Scanner</p>
+                            <p class="text-[10px] text-slate-600 mt-2 mono">yt-dlp</p>
+                        </div>
+
+                        <!-- Pickaxe -->
+                        <div class="card-hover bg-slate-900/90 backdrop-blur rounded-2xl p-4 border border-slate-700 text-center group">
+                            <div class="w-14 h-14 mx-auto mb-3 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="text-2xl">⛏️</span>
+                            </div>
+                            <h3 class="font-bold text-orange-400 mb-1">Pickaxe</h3>
+                            <p class="text-xs text-slate-500">Extractor</p>
+                            <p class="text-[10px] text-slate-600 mt-2 mono">Whisper</p>
+                        </div>
+
+                        <!-- Gemcutter -->
+                        <div class="card-hover bg-slate-900/90 backdrop-blur rounded-2xl p-4 border border-slate-700 text-center group">
+                            <div class="w-14 h-14 mx-auto mb-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center group-hover:scale-110 transition-transform pulse-gold">
+                                <span class="text-2xl">💎</span>
+                            </div>
+                            <h3 class="font-bold text-purple-400 mb-1">Gemcutter</h3>
+                            <p class="text-xs text-slate-500">Clasificador</p>
+                            <p class="text-[10px] text-slate-600 mt-2 mono">LLM</p>
+                        </div>
+
+                        <!-- Vault -->
+                        <div class="card-hover bg-slate-900/90 backdrop-blur rounded-2xl p-4 border border-slate-700 text-center group">
+                            <div class="w-14 h-14 mx-auto mb-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="text-2xl">🏛️</span>
+                            </div>
+                            <h3 class="font-bold text-blue-400 mb-1">Vault</h3>
+                            <p class="text-xs text-slate-500">Base de Datos</p>
+                            <p class="text-[10px] text-slate-600 mt-2 mono">JSON + HTML</p>
+                        </div>
+
+                        <!-- Compass -->
+                        <div class="card-hover bg-slate-900/90 backdrop-blur rounded-2xl p-4 border border-slate-700 text-center group">
+                            <div class="w-14 h-14 mx-auto mb-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="text-2xl">🧭</span>
+                            </div>
+                            <h3 class="font-bold text-emerald-400 mb-1">Compass</h3>
+                            <p class="text-xs text-slate-500">Interfaz Web</p>
+                            <p class="text-[10px] text-slate-600 mt-2 mono">Flask</p>
+                        </div>
+
+                        <!-- Cartographer -->
+                        <div class="card-hover bg-slate-900/90 backdrop-blur rounded-2xl p-4 border border-slate-700 text-center group">
+                            <div class="w-14 h-14 mx-auto mb-3 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="text-2xl">🗺️</span>
+                            </div>
+                            <h3 class="font-bold text-amber-400 mb-1">Cartographer</h3>
+                            <p class="text-xs text-slate-500">Knowledge Graph</p>
+                            <p class="text-[10px] text-slate-600 mt-2 mono">D3.js</p>
+                        </div>
+
+                        <!-- Prospector -->
+                        <div class="card-hover bg-slate-900/90 backdrop-blur rounded-2xl p-4 border border-cyan-500/50 text-center group relative overflow-hidden">
+                            <div class="absolute top-2 right-2">
+                                <span class="text-[10px] bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-full">NEW</span>
+                            </div>
+                            <div class="w-14 h-14 mx-auto mb-3 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="text-2xl">🔬</span>
+                            </div>
+                            <h3 class="font-bold text-cyan-400 mb-1">Prospector</h3>
+                            <p class="text-xs text-slate-500">Embeddings Lab</p>
+                            <p class="text-[10px] text-slate-600 mt-2 mono">nomic-embed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Divider -->
+        <div class="section-divider mb-20"></div>
+
+        <!-- Section: LLM Engines -->
+        <section class="mb-20 reveal">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <i class="fa-solid fa-brain text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-white">Motores de IA</h2>
+                    <p class="text-slate-400">Tres opciones para diferentes necesidades</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Ollama -->
+                <div class="card-hover bg-gradient-to-br from-emerald-900/30 to-teal-900/30 rounded-2xl border border-emerald-500/30 p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-server text-emerald-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-emerald-400">Ollama</h3>
+                            <p class="text-xs text-slate-500">Local & Gratuito</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-check text-emerald-400"></i>
+                            <span class="text-slate-300">100% privado</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-check text-emerald-400"></i>
+                            <span class="text-slate-300">Sin costos</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-check text-emerald-400"></i>
+                            <span class="text-slate-300">Llama 3.2 / Mistral</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-slate-900/50 rounded-lg">
+                        <code class="text-xs text-emerald-300">python videomine.py "URL"</code>
+                    </div>
+                </div>
+
+                <!-- Claude Code -->
+                <div class="card-hover bg-gradient-to-br from-amber-900/30 to-orange-900/30 rounded-2xl border border-amber-500/50 p-6 relative glow-gold">
+                    <div class="absolute top-4 right-4">
+                        <span class="text-xs bg-amber-500 text-black px-2 py-1 rounded-full font-bold">RECOMENDADO</span>
+                    </div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-terminal text-amber-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-amber-400">Claude Code</h3>
+                            <p class="text-xs text-slate-500">Tu Suscripcion</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-check text-amber-400"></i>
+                            <span class="text-slate-300">Maxima calidad</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-check text-amber-400"></i>
+                            <span class="text-slate-300">Pro/Max incluido</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-check text-amber-400"></i>
+                            <span class="text-slate-300">Mejor extraccion</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-slate-900/50 rounded-lg">
+                        <code class="text-xs text-amber-300">python videomine.py "URL" --claude-code</code>
+                    </div>
+                </div>
+
+                <!-- Claude API -->
+                <div class="card-hover bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-2xl border border-purple-500/30 p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-cloud text-purple-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-purple-400">Claude API</h3>
+                            <p class="text-xs text-slate-500">Pago por Tokens</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-check text-purple-400"></i>
+                            <span class="text-slate-300">Programatico</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-check text-purple-400"></i>
+                            <span class="text-slate-300">Alta disponibilidad</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-minus text-slate-500"></i>
+                            <span class="text-slate-400">~$0.01/video</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-slate-900/50 rounded-lg">
+                        <code class="text-xs text-purple-300">python videomine.py "URL" --claude</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Divider -->
+        <div class="section-divider mb-20"></div>
+
+        <!-- Section: Extraction Flow -->
+        <section class="mb-20 reveal">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+                    <i class="fa-solid fa-diagram-project text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-white">Flujo de Extraccion</h2>
+                    <p class="text-slate-400">De URL a nugget estructurado</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 rounded-3xl border border-slate-800 p-8">
+                <!-- Step 1 -->
+                <div class="flex gap-6 mb-8">
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-black font-bold">1</div>
+                        <div class="step-line w-0.5 flex-1 mt-2"></div>
+                    </div>
+                    <div class="flex-1 pb-8">
+                        <h3 class="text-xl font-bold text-amber-400 mb-2">Tunnel: Escaneo</h3>
+                        <p class="text-slate-400 mb-4">yt-dlp extrae metadatos del video</p>
+                        <div class="code-block rounded-xl p-4 overflow-x-auto">
+                            <pre class="text-sm text-slate-300"><code>video_info = {
+    "id": "abc123",
+    "title": "Machine Learning Explained",
+    "channel": "TechChannel",
+    "duration": 1200,
+    "thumbnail": "https://..."
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex gap-6 mb-8">
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-black font-bold">2</div>
+                        <div class="step-line w-0.5 flex-1 mt-2"></div>
+                    </div>
+                    <div class="flex-1 pb-8">
+                        <h3 class="text-xl font-bold text-orange-400 mb-2">Pickaxe: Transcripcion</h3>
+                        <p class="text-slate-400 mb-4">Prioridad: Subtitulos > Whisper</p>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-slate-800/50 rounded-xl p-4 border border-emerald-500/30">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-closed-captioning text-emerald-400"></i>
+                                    <span class="font-medium text-emerald-400">Subtitulos</span>
+                                </div>
+                                <p class="text-xs text-slate-500">Rapido, preciso si existen</p>
+                            </div>
+                            <div class="bg-slate-800/50 rounded-xl p-4 border border-purple-500/30">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-microphone text-purple-400"></i>
+                                    <span class="font-medium text-purple-400">Whisper</span>
+                                </div>
+                                <p class="text-xs text-slate-500">Fallback, transcripcion de audio</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex gap-6 mb-8">
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-bold">3</div>
+                        <div class="step-line w-0.5 flex-1 mt-2"></div>
+                    </div>
+                    <div class="flex-1 pb-8">
+                        <h3 class="text-xl font-bold text-purple-400 mb-2">Gemcutter: Estructuracion LLM</h3>
+                        <p class="text-slate-400 mb-4">El LLM extrae conocimiento estructurado</p>
+                        <div class="code-block rounded-xl p-4 overflow-x-auto">
+                            <pre class="text-sm text-slate-300"><code>{
+    "idea_principal": "Machine Learning permite...",
+    "puntos_clave": ["Supervisado", "No supervisado", "Refuerzo"],
+    "glosario": {"ML": "Subconjunto de IA..."},
+    "preguntas_profundizar": ["Como elegir algoritmo?"],
+    "recursos_mencionados": ["scikit-learn", "PyTorch"]
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="flex gap-6">
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">4</div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-blue-400 mb-2">Vault: Almacenamiento</h3>
+                        <p class="text-slate-400 mb-4">HTML renderizado + JSON indexado</p>
+                        <div class="flex gap-4">
+                            <div class="flex items-center gap-2 text-sm bg-slate-800/50 px-4 py-2 rounded-lg">
+                                <i class="fa-solid fa-file-code text-blue-400"></i>
+                                <span class="mono text-slate-300">nugget_abc123.html</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm bg-slate-800/50 px-4 py-2 rounded-lg">
+                                <i class="fa-solid fa-database text-amber-400"></i>
+                                <span class="mono text-slate-300">nuggets.json</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Divider -->
+        <div class="section-divider mb-20"></div>
+
+        <!-- Section: Knowledge Graph -->
+        <section class="mb-20 reveal">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center">
+                    <i class="fa-solid fa-share-nodes text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-white">Cartographer: Knowledge Graph</h2>
+                    <p class="text-slate-400">Conexiones semanticas estilo Obsidian</p>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Graph Visualization -->
+                <div class="bg-slate-900 rounded-3xl border border-amber-500/30 p-6 glow-gold">
+                    <h3 class="font-bold text-amber-400 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-diagram-project"></i>
+                        Grafo Interactivo
+                    </h3>
+                    <div id="mini-graph" class="w-full h-64 bg-slate-950 rounded-xl"></div>
+                    <p class="text-xs text-slate-500 mt-3 text-center">Arrastra los nodos para explorar</p>
+                </div>
+
+                <!-- How it works -->
+                <div class="space-y-4">
+                    <div class="bg-slate-900 rounded-2xl border border-slate-700 p-5">
+                        <h4 class="font-bold text-white mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center text-purple-400 text-sm">1</span>
+                            Extraccion de Conceptos
+                        </h4>
+                        <p class="text-sm text-slate-400 mb-3">Claude Code analiza cada nugget y extrae conceptos clave</p>
+                        <div class="code-block rounded-lg p-3 text-xs">
+                            <code class="text-purple-300">{"name": "Machine Learning", "type": "concepto", "importance": 0.9}</code>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 rounded-2xl border border-slate-700 p-5">
+                        <h4 class="font-bold text-white mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded bg-blue-500/20 flex items-center justify-center text-blue-400 text-sm">2</span>
+                            Unificacion de Sinonimos
+                        </h4>
+                        <p class="text-sm text-slate-400 mb-3">Normaliza variantes: "Python 3" = "python" = "py"</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-xs bg-slate-800 px-2 py-1 rounded text-slate-400">ML</span>
+                            <span class="text-xs text-slate-600">=</span>
+                            <span class="text-xs bg-slate-800 px-2 py-1 rounded text-slate-400">machine learning</span>
+                            <span class="text-xs text-slate-600">=</span>
+                            <span class="text-xs bg-blue-500/20 px-2 py-1 rounded text-blue-400 font-medium">Machine Learning</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 rounded-2xl border border-slate-700 p-5">
+                        <h4 class="font-bold text-white mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-sm">3</span>
+                            Grafo D3.js
+                        </h4>
+                        <p class="text-sm text-slate-400 mb-3">Visualizacion force-directed interactiva</p>
+                        <div class="flex gap-3">
+                            <div class="flex items-center gap-2 text-xs">
+                                <div class="w-3 h-3 rounded-full bg-blue-400"></div>
+                                <span class="text-slate-400">Concepto</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs">
+                                <div class="w-3 h-3 rounded-full bg-emerald-400"></div>
+                                <span class="text-slate-400">Lenguaje</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs">
+                                <div class="w-3 h-3 rounded-full bg-amber-400"></div>
+                                <span class="text-slate-400">Libreria</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Divider -->
+        <div class="section-divider mb-20"></div>
+
+        <!-- Section: Prospector Lab -->
+        <section class="mb-20 reveal">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                    <i class="fa-solid fa-flask text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-white">Prospector: Laboratorio de Embeddings</h2>
+                    <p class="text-slate-400">Busqueda semantica con nomic-embed-text</p>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Features -->
+                <div class="space-y-4">
+                    <div class="bg-slate-900 rounded-2xl border border-cyan-500/30 p-5">
+                        <h4 class="font-bold text-white mb-3 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded bg-cyan-500/20 flex items-center justify-center text-cyan-400">🔍</span>
+                            Busqueda Semantica
+                        </h4>
+                        <p class="text-sm text-slate-400 mb-3">Encuentra conceptos por significado, no por palabras exactas</p>
+                        <div class="code-block rounded-lg p-3 text-xs">
+                            <code class="text-cyan-300">Query: "crear servidor web"<br/>→ Flask (0.78), FastAPI (0.76), Django (0.65)</code>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 rounded-2xl border border-purple-500/30 p-5">
+                        <h4 class="font-bold text-white mb-3 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded bg-purple-500/20 flex items-center justify-center text-purple-400">🎮</span>
+                            Quiz de Similitud
+                        </h4>
+                        <p class="text-sm text-slate-400 mb-3">Mini-juego interactivo para entender embeddings</p>
+                        <div class="bg-slate-800/50 rounded-lg p-3 text-xs text-slate-400">
+                            Cual es mas similar a "Python"?<br/>
+                            <span class="text-emerald-400">✓ Flask</span> | React | Docker | Kubernetes
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 rounded-2xl border border-amber-500/30 p-5">
+                        <h4 class="font-bold text-white mb-3 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded bg-amber-500/20 flex items-center justify-center text-amber-400">📊</span>
+                            Mapa 2D de Conceptos
+                        </h4>
+                        <p class="text-sm text-slate-400">Visualizacion espacial con PCA y clustering automatico</p>
+                    </div>
+                </div>
+
+                <!-- How it works -->
+                <div class="bg-slate-900 rounded-3xl border border-slate-700 p-6">
+                    <h3 class="font-bold text-cyan-400 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-microchip"></i>
+                        Como funcionan los Embeddings
+                    </h3>
+                    <div class="space-y-4 text-sm text-slate-400">
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-xs shrink-0">1</span>
+                            <p><strong class="text-white">Vectorizacion:</strong> Cada concepto se convierte en un vector de 768 dimensiones</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-xs shrink-0">2</span>
+                            <p><strong class="text-white">Similitud coseno:</strong> Conceptos similares apuntan en la misma direccion</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-xs shrink-0">3</span>
+                            <p><strong class="text-white">PCA:</strong> Reducimos 768D a 2D para visualizar</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-xl">
+                        <p class="text-sm text-cyan-300 flex items-start gap-2">
+                            <i class="fa-solid fa-terminal mt-0.5"></i>
+                            <code>ollama pull nomic-embed-text</code>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Divider -->
+        <div class="section-divider mb-20"></div>
+
+        <!-- Section: Interactive Features -->
+        <section class="mb-20 reveal">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                    <i class="fa-solid fa-wand-magic-sparkles text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-white">Funciones Interactivas</h2>
+                    <p class="text-slate-400">Expande tu conocimiento bajo demanda</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Explicame mas -->
+                <div class="card-hover bg-gradient-to-br from-cyan-900/30 to-blue-900/30 rounded-2xl border border-cyan-500/30 p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-expand text-cyan-400"></i>
+                        </div>
+                        <h3 class="font-bold text-cyan-400">Explicame Mas</h3>
+                    </div>
+                    <p class="text-sm text-slate-400 mb-4">Click en cualquier punto clave para expandirlo con Ollama</p>
+                    <div class="bg-slate-900/50 rounded-xl p-4">
+                        <div class="flex items-center gap-2 text-sm text-slate-300 mb-2">
+                            <i class="fa-solid fa-circle text-cyan-400 text-xs"></i>
+                            Redes neuronales aprenden patrones
+                            <span class="text-cyan-400 text-xs ml-auto cursor-pointer hover:underline">+ mas</span>
+                        </div>
+                        <div class="pl-4 border-l-2 border-cyan-500/30 text-xs text-slate-500 mt-2">
+                            Las redes neuronales son modelos computacionales inspirados en el cerebro humano...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mapa Conceptual -->
+                <div class="card-hover bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-2xl border border-purple-500/30 p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-sitemap text-purple-400"></i>
+                        </div>
+                        <h3 class="font-bold text-purple-400">Mapa Conceptual</h3>
+                    </div>
+                    <p class="text-sm text-slate-400 mb-4">Visualiza relaciones entre puntos clave del video</p>
+                    <div class="bg-slate-900/50 rounded-xl p-4">
+                        <svg viewBox="0 0 200 100" class="w-full h-20">
+                            <line x1="50" y1="50" x2="100" y2="30" stroke="#a855f7" stroke-width="2" stroke-opacity="0.5"/>
+                            <line x1="50" y1="50" x2="100" y2="70" stroke="#a855f7" stroke-width="2" stroke-opacity="0.5"/>
+                            <line x1="100" y1="30" x2="150" y2="50" stroke="#a855f7" stroke-width="2" stroke-opacity="0.3"/>
+                            <line x1="100" y1="70" x2="150" y2="50" stroke="#a855f7" stroke-width="2" stroke-opacity="0.3"/>
+                            <circle cx="50" cy="50" r="8" fill="#a855f7"/>
+                            <circle cx="100" cy="30" r="6" fill="#ec4899"/>
+                            <circle cx="100" cy="70" r="6" fill="#ec4899"/>
+                            <circle cx="150" cy="50" r="5" fill="#8b5cf6"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Export Anki -->
+                <div class="card-hover bg-gradient-to-br from-emerald-900/30 to-teal-900/30 rounded-2xl border border-emerald-500/30 p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-graduation-cap text-emerald-400"></i>
+                        </div>
+                        <h3 class="font-bold text-emerald-400">Export Anki</h3>
+                    </div>
+                    <p class="text-sm text-slate-400 mb-4">Genera flashcards desde el glosario</p>
+                    <div class="code-block rounded-lg p-3 text-xs">
+                        <code class="text-emerald-300">Front: Que es Machine Learning?<br/>Back: Subconjunto de IA que...</code>
+                    </div>
+                </div>
+
+                <!-- HTML Imprimible -->
+                <div class="card-hover bg-gradient-to-br from-amber-900/30 to-orange-900/30 rounded-2xl border border-amber-500/30 p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-print text-amber-400"></i>
+                        </div>
+                        <h3 class="font-bold text-amber-400">HTML Imprimible</h3>
+                    </div>
+                    <p class="text-sm text-slate-400 mb-4">Ficha de estudio con checkboxes y notas</p>
+                    <div class="bg-slate-900/50 rounded-lg p-3 text-xs space-y-1">
+                        <div class="flex items-center gap-2 text-slate-400">
+                            <input type="checkbox" class="rounded" disabled>
+                            <span>Punto clave 1</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-400">
+                            <input type="checkbox" class="rounded" disabled>
+                            <span>Punto clave 2</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Divider -->
+        <div class="section-divider mb-20"></div>
+
+        <!-- Section: Architecture -->
+        <section class="mb-20 reveal">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-500 to-slate-600 flex items-center justify-center">
+                    <i class="fa-solid fa-folder-tree text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-white">Arquitectura</h2>
+                    <p class="text-slate-400">Estructura modular del proyecto</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 rounded-3xl border border-slate-800 p-8">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- File tree -->
+                    <div>
+                        <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-folder text-amber-400"></i>
+                            videomine/
+                        </h3>
+                        <div class="mono text-sm space-y-1 bg-slate-950 rounded-xl p-4">
+                            <div class="text-slate-400">├── <span class="text-blue-400">videomine.py</span> <span class="text-slate-600"># CLI</span></div>
+                            <div class="text-slate-400">├── <span class="text-blue-400">compass_server.py</span> <span class="text-slate-600"># Flask</span></div>
+                            <div class="text-slate-400">├── <span class="text-amber-400">tunnel/</span> <span class="text-slate-600"># Scanner</span></div>
+                            <div class="text-slate-400">├── <span class="text-orange-400">gemcutter/</span> <span class="text-slate-600"># LLM</span></div>
+                            <div class="text-slate-400">├── <span class="text-purple-400">cartographer/</span> <span class="text-slate-600"># Graph + Lab</span></div>
+                            <div class="text-slate-400">│   ├── <span class="text-slate-300">extractor.py</span></div>
+                            <div class="text-slate-400">│   ├── <span class="text-slate-300">graph.py</span></div>
+                            <div class="text-slate-400">│   └── <span class="text-cyan-300">embeddings_lab.py</span></div>
+                            <div class="text-slate-400">├── <span class="text-blue-400">vault/</span> <span class="text-slate-600"># Storage</span></div>
+                            <div class="text-slate-400">│   ├── <span class="text-emerald-400">nuggets.json</span></div>
+                            <div class="text-slate-400">│   └── <span class="text-slate-300">*.html</span></div>
+                            <div class="text-slate-400">└── <span class="text-cyan-400">compass/templates/</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Tech Stack -->
+                    <div>
+                        <h3 class="font-bold text-slate-300 mb-4">Stack Tecnologico</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-full text-xs font-medium border border-blue-500/30">Python 3.9+</span>
+                            <span class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-full text-xs font-medium border border-red-500/30">Flask</span>
+                            <span class="px-3 py-1.5 bg-amber-500/20 text-amber-400 rounded-full text-xs font-medium border border-amber-500/30">Jinja2</span>
+                            <span class="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-medium border border-emerald-500/30">yt-dlp</span>
+                            <span class="px-3 py-1.5 bg-purple-500/20 text-purple-400 rounded-full text-xs font-medium border border-purple-500/30">Whisper</span>
+                            <span class="px-3 py-1.5 bg-pink-500/20 text-pink-400 rounded-full text-xs font-medium border border-pink-500/30">Ollama</span>
+                            <span class="px-3 py-1.5 bg-orange-500/20 text-orange-400 rounded-full text-xs font-medium border border-orange-500/30">Claude</span>
+                            <span class="px-3 py-1.5 bg-cyan-500/20 text-cyan-400 rounded-full text-xs font-medium border border-cyan-500/30">D3.js</span>
+                            <span class="px-3 py-1.5 bg-slate-500/20 text-slate-400 rounded-full text-xs font-medium border border-slate-500/30">JSON</span>
+                        </div>
+
+                        <div class="mt-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                            <p class="text-sm text-amber-300 flex items-start gap-2">
+                                <i class="fa-solid fa-lightbulb mt-0.5"></i>
+                                <span><strong>Principio:</strong> Sin magia negra. Local first. KISS.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center py-12 border-t border-slate-800">
+            <div class="mb-6">
+                <span class="text-4xl">⛏️</span>
+            </div>
+            <p class="text-slate-500 italic text-lg mb-2">"Piano piano se arriva lontano"</p>
+            <p class="text-xs text-slate-600 mb-6">No es la velocidad, es la direccion.</p>
+            <div class="flex justify-center gap-4">
+                <a href="/" class="px-4 py-2 bg-amber-500/20 text-amber-400 rounded-lg text-sm hover:bg-amber-500/30 transition">
+                    <i class="fa-solid fa-arrow-left mr-2"></i>Volver al Vault
+                </a>
+                <a href="/vault/graph" class="px-4 py-2 bg-purple-500/20 text-purple-400 rounded-lg text-sm hover:bg-purple-500/30 transition">
+                    <i class="fa-solid fa-share-nodes mr-2"></i>Ver Knowledge Graph
+                </a>
+                <a href="/lab" class="px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg text-sm hover:bg-cyan-500/30 transition">
+                    <i class="fa-solid fa-flask mr-2"></i>Abrir Lab
+                </a>
+            </div>
+            <p class="text-xs text-slate-700 mt-8">VideoMine v0.4.0 "Prospector" - Parte del ecosistema minerOS</p>
+        </footer>
+
+    </main>
+
+    <script>
+        // Scroll reveal animation
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+        reveals.forEach(el => observer.observe(el));
+
+        // Mini D3 Graph
+        const graphData = {
+            nodes: [
+                { id: "Machine Learning", color: "#4a9eff" },
+                { id: "Python", color: "#51cf66" },
+                { id: "Neural Network", color: "#4a9eff" },
+                { id: "Claude Code", color: "#ffa500" },
+                { id: "Git", color: "#ff6b6b" },
+                { id: "Deep Learning", color: "#a855f7" },
+                { id: "Ollama", color: "#f472b6" }
+            ],
+            links: [
+                { source: "Machine Learning", target: "Python" },
+                { source: "Machine Learning", target: "Neural Network" },
+                { source: "Neural Network", target: "Deep Learning" },
+                { source: "Python", target: "Ollama" },
+                { source: "Claude Code", target: "Machine Learning" },
+                { source: "Git", target: "Python" }
+            ]
+        };
+
+        const container = document.getElementById('mini-graph');
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+
+        const svg = d3.select('#mini-graph')
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height);
+
+        const simulation = d3.forceSimulation(graphData.nodes)
+            .force('link', d3.forceLink(graphData.links).id(d => d.id).distance(60))
+            .force('charge', d3.forceManyBody().strength(-200))
+            .force('center', d3.forceCenter(width / 2, height / 2));
+
+        const link = svg.append('g')
+            .selectAll('line')
+            .data(graphData.links)
+            .enter()
+            .append('line')
+            .attr('stroke', '#334155')
+            .attr('stroke-width', 2);
+
+        const node = svg.append('g')
+            .selectAll('circle')
+            .data(graphData.nodes)
+            .enter()
+            .append('circle')
+            .attr('r', 8)
+            .attr('fill', d => d.color)
+            .call(d3.drag()
+                .on('start', dragstarted)
+                .on('drag', dragged)
+                .on('end', dragended));
+
+        const label = svg.append('g')
+            .selectAll('text')
+            .data(graphData.nodes)
+            .enter()
+            .append('text')
+            .text(d => d.id.length > 10 ? d.id.substring(0, 8) + '...' : d.id)
+            .attr('font-size', '9px')
+            .attr('fill', '#94a3b8')
+            .attr('dx', 12)
+            .attr('dy', 4);
+
+        simulation.on('tick', () => {
+            link
+                .attr('x1', d => d.source.x)
+                .attr('y1', d => d.source.y)
+                .attr('x2', d => d.target.x)
+                .attr('y2', d => d.target.y);
+            node
+                .attr('cx', d => d.x)
+                .attr('cy', d => d.y);
+            label
+                .attr('x', d => d.x)
+                .attr('y', d => d.y);
+        });
+
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+    </script>
+</body>
+</html>

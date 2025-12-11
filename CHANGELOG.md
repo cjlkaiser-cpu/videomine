@@ -2,6 +2,52 @@
 
 Todos los cambios notables en VideoMine.
 
+## [0.4.0] - 2024-12-11 "Prospector"
+
+### Nuevas Funciones
+
+- **Laboratorio de Embeddings**: Experimenta con busqueda semantica usando `nomic-embed-text`
+  - Busqueda semantica: Encuentra conceptos por significado, no palabras exactas
+  - Quiz de similitud: Mini-juego interactivo con confetti al acertar
+  - Comparador de similitud: Visualiza similitud entre dos conceptos (0-1)
+  - Mapa 2D de conceptos: Visualizacion espacial con PCA simplificado
+  - Clustering automatico: Agrupa conceptos por tematica (k-means)
+  - Panel de ayuda: Explica que son embeddings, que modelo usamos, de donde vienen los datos
+
+- **Nuevo modulo `cartographer/embeddings_lab.py`**:
+  - `get_embedding()`: Genera embeddings via Ollama HTTP API
+  - `semantic_search()`: Busqueda por similitud coseno
+  - `compute_similarity()`: Calcula similitud entre dos conceptos
+  - `detect_clusters()`: K-means simplificado
+  - `compute_pca_2d()`: Reduccion de dimensionalidad para visualizacion
+  - `generate_quiz_question()`: Genera preguntas de similitud
+
+- **Nueva UI `compass/templates/lab.html`**:
+  - Diseno visual con barras animadas
+  - Confetti al acertar quiz
+  - Medidor de similitud interactivo
+  - Grafico 2D de conceptos por clusters
+
+- **Nuevos endpoints API**:
+  - `GET /lab` - Pagina del laboratorio
+  - `GET /api/lab/concepts` - Lista de conceptos del grafo
+  - `POST /api/lab/search` - Busqueda semantica
+  - `POST /api/lab/similarity` - Similitud entre dos conceptos
+  - `GET /api/lab/quiz` - Nueva pregunta de quiz
+  - `POST /api/lab/quiz/check` - Verificar respuesta
+  - `GET /api/lab/visualization` - Datos para grafico 2D
+
+### Mejoras
+
+- Boton "Lab" en header del Vault junto a Knowledge Graph
+- Documentacion del Lab en `docs/embeddings_lab.md`
+
+### Requisitos nuevos
+
+- `nomic-embed-text` (modelo Ollama): `ollama pull nomic-embed-text`
+
+---
+
 ## [0.3.0] - 2024-12-11 "Cartographer"
 
 ### Nuevas Funciones

@@ -2,6 +2,60 @@
 
 Mejoras planificadas para VideoMine.
 
+## Fase 5: Prospector - Laboratorio de Embeddings (Completada v0.4.0)
+
+Sistema de busqueda semantica y experimentacion con embeddings usando `nomic-embed-text`.
+
+### Funciones implementadas
+
+- **Busqueda semantica**: Encuentra conceptos por significado, no por palabras exactas
+- **Quiz de similitud**: Mini-juego para entender embeddings (con confetti)
+- **Comparador de similitud**: Visualiza similitud entre dos conceptos (0-1)
+- **Mapa 2D de conceptos**: Visualizacion espacial con PCA simplificado
+- **Clustering automatico**: Agrupa conceptos por tematica (k-means)
+- **Panel de ayuda**: Explica embeddings, modelo usado, origen de datos
+
+### Arquitectura
+
+```
+cartographer/
+├── embeddings_lab.py   # Funciones de embeddings (Ollama HTTP API)
+└── data/
+    └── graph.json      # Fuente de conceptos
+
+compass/templates/
+└── lab.html            # UI interactiva del laboratorio
+```
+
+### Endpoints
+
+| Endpoint | Metodo | Descripcion |
+|----------|--------|-------------|
+| `/lab` | GET | Pagina del laboratorio |
+| `/api/lab/concepts` | GET | Lista de conceptos |
+| `/api/lab/search` | POST | Busqueda semantica |
+| `/api/lab/similarity` | POST | Similitud entre conceptos |
+| `/api/lab/quiz` | GET | Nueva pregunta quiz |
+| `/api/lab/quiz/check` | POST | Verificar respuesta |
+| `/api/lab/visualization` | GET | Datos para grafico 2D |
+
+### Tecnologias
+
+- **Embeddings**: `nomic-embed-text` via Ollama HTTP API (768 dimensiones)
+- **Similitud**: Coseno
+- **Reduccion dimensional**: PCA simplificado (sin sklearn)
+- **Clustering**: K-means simplificado
+- **Visualizacion**: Canvas 2D con puntos coloreados por cluster
+
+### Proximos pasos (futuras versiones)
+
+1. Integrar embeddings en Cartographer (busqueda semantica global)
+2. Deteccion de lagunas de conocimiento
+3. Recomendaciones de videos relacionados por semantica
+4. Embeddings persistentes (no recalcular cada vez)
+
+---
+
 ## Fase 4: Cartographer - Grafo de Conocimiento (Completada v0.3.0)
 
 Sistema de conexión semántica entre videos, estilo Obsidian. Grafo por **conceptos** donde cada nodo es un concepto y los videos son fuentes que lo alimentan.
@@ -204,4 +258,4 @@ Boton que genera una ficha de estudio completa para un punto clave:
 
 ---
 
-> Ultima actualizacion: 2024-12-11 (v0.3.0 Cartographer)
+> Ultima actualizacion: 2024-12-11 (v0.4.0 Prospector)

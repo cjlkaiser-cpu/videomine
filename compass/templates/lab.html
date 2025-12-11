@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Laboratorio de Embeddings - VideoMine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold: #ffa500;
+            --gold-light: #ffb733;
+            --gold-dark: #cc8400;
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-hover: #1a1a25;
+            --text: #e0e0e0;
+            --text-muted: #888;
+            --success: #10b981;
+            --error: #ef4444;
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--bg-card) 0%, #1a1520 100%);
+            border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 165, 0, 0.3);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--gold);
+            background: rgba(255, 165, 0, 0.1);
+        }
+
+        /* Main content */
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--gold) 0%, #fff 50%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .hero-help {
+            margin-top: 1.5rem;
+        }
+
+        .help-btn {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            color: var(--gold);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .help-btn:hover {
+            background: rgba(255, 165, 0, 0.2);
+        }
+
+        /* Info panel */
+        .info-panel {
+            display: none;
+            max-width: 800px;
+            margin: 1.5rem auto 0;
+            text-align: left;
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 165, 0, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            animation: slideDown 0.3s ease;
+        }
+
+        .info-panel.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+
+        .info-item h4 {
+            color: var(--gold);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-item p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .info-item code {
+            background: rgba(255, 165, 0, 0.1);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--gold);
+        }
+
+        /* Grid layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 165, 0, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 165, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(255, 165, 0, 0.1);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--gold);
+        }
+
+        /* Search section */
+        .search-box {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 165, 0, 0.2);
+            border-radius: 12px;
+            padding: 0.875rem 1rem;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(255, 165, 0, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Results */
+        .results {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        .result-item:hover {
+            background: rgba(255, 165, 0, 0.05);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .result-emoji {
+            font-size: 1.2rem;
+        }
+
+        .result-name {
+            flex: 0 0 120px;
+            font-weight: 500;
+        }
+
+        .result-bar-container {
+            flex: 1;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .result-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            border-radius: 12px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .result-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(100%); }
+        }
+
+        .result-score {
+            flex: 0 0 60px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--gold);
+        }
+
+        /* Quiz section */
+        .quiz-question {
+            font-size: 1.3rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .quiz-question span {
+            color: var(--gold);
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 165, 0, 0.2);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--gold);
+            background: rgba(255, 165, 0, 0.1);
+            transform: scale(1.02);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.2);
+            animation: pulse 0.5s ease;
+        }
+
+        .quiz-option.incorrect {
+            border-color: var(--error);
+            background: rgba(239, 68, 68, 0.2);
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .quiz-feedback {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 500;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .quiz-feedback.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
+        }
+
+        .quiz-feedback.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--error);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Visualization */
+        .viz-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .viz-node {
+            position: absolute;
+            padding: 0.5rem 0.75rem;
+            background: var(--gold);
+            color: #000;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            animation: nodeAppear 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes nodeAppear {
+            from {
+                opacity: 0;
+                transform: scale(0);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .viz-node:hover {
+            transform: scale(1.2);
+            z-index: 10;
+            box-shadow: 0 5px 20px rgba(255, 165, 0, 0.5);
+        }
+
+        /* Similarity comparator */
+        .comparator {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .comparator select {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 165, 0, 0.2);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: var(--text);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .comparator select:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        .comparator-arrow {
+            font-size: 1.5rem;
+            color: var(--gold);
+            animation: pulse 2s infinite;
+        }
+
+        .similarity-display {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 165, 0, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 165, 0, 0.2);
+        }
+
+        .similarity-value {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold) 0%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .similarity-label {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .similarity-meter {
+            margin-top: 1.5rem;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .similarity-meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--error), var(--gold), var(--success));
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+
+        /* Status indicator */
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .status.loading {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--blue);
+        }
+
+        .status.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--error);
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Footer info */
+        .info-box {
+            background: rgba(255, 165, 0, 0.05);
+            border: 1px solid rgba(255, 165, 0, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .info-box code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .quiz-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">🧪 Laboratorio de Embeddings</div>
+            <nav class="nav-links">
+                <a href="/" class="nav-link">🏛️ Vault</a>
+                <a href="/vault/graph" class="nav-link">🗺️ Graph</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="hero">
+            <h1>Experimenta con Embeddings</h1>
+            <p>Descubre como la IA entiende el significado de los conceptos y encuentra relaciones ocultas entre ellos.</p>
+            <div class="hero-help">
+                <button class="help-btn" onclick="toggleHelp()">? Como funciona</button>
+            </div>
+            <div class="info-panel" id="infoPanel">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <h4>🧠 Que son los Embeddings?</h4>
+                        <p>Vectores numericos (768 dimensiones) que representan el <strong>significado</strong> de un texto. Palabras similares tienen vectores cercanos.</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>🤖 Que modelo usamos?</h4>
+                        <p><code>nomic-embed-text</code> via Ollama. Modelo local, gratuito, 274MB. Especializado en embeddings semanticos.</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>📊 De donde vienen los datos?</h4>
+                        <p>Del <strong>Knowledge Graph</strong> (Cartographer). Si no hay videos minados, usa conceptos de ejemplo.</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>🎯 Para que sirve el Lab?</h4>
+                        <p>Experimentar con busqueda semantica antes de integrarla en VideoMine. Entender como la IA "ve" relaciones.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid">
+            <!-- Búsqueda semántica -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">🔍</span>
+                    <span class="card-title">Búsqueda Semántica</span>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="search-input" class="search-input" placeholder="ej: crear servidor web, análisis de datos...">
+                    <button class="btn" onclick="semanticSearch()">Buscar</button>
+                </div>
+                <div id="search-status"></div>
+                <div id="search-results" class="results">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔮</div>
+                        <p>Escribe algo para buscar por significado, no solo palabras</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mini-juego Quiz -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">🎮</span>
+                    <span class="card-title">Quiz de Similitud</span>
+                </div>
+                <div id="quiz-container">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎯</div>
+                        <p>Cargando quiz...</p>
+                    </div>
+                </div>
+                <button class="btn" onclick="loadQuiz()" style="width: 100%; margin-top: 1rem;">Nuevo Quiz</button>
+            </div>
+
+            <!-- Comparador de similitud -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">⚖️</span>
+                    <span class="card-title">Comparador de Similitud</span>
+                </div>
+                <div class="comparator">
+                    <select id="concept-a" onchange="compareConcepts()">
+                        <option value="">Selecciona...</option>
+                    </select>
+                    <span class="comparator-arrow">↔</span>
+                    <select id="concept-b" onchange="compareConcepts()">
+                        <option value="">Selecciona...</option>
+                    </select>
+                </div>
+                <div id="similarity-result">
+                    <div class="similarity-display">
+                        <div class="similarity-value" id="sim-value">--</div>
+                        <div class="similarity-label">similitud coseno</div>
+                        <div class="similarity-meter">
+                            <div class="similarity-meter-fill" id="sim-meter" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualización 2D -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">📊</span>
+                    <span class="card-title">Mapa de Conceptos (2D)</span>
+                </div>
+                <div id="viz-status"></div>
+                <div class="viz-container" id="viz-container">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🗺️</div>
+                        <p>Cargando visualización...</p>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Tip:</strong> Los conceptos cercanos tienen significados similares.
+                    Los colores indican clusters temáticos detectados automáticamente.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Estado global
+        let concepts = [];
+        let currentQuiz = null;
+
+        // Toggle panel de ayuda
+        function toggleHelp() {
+            const panel = document.getElementById('infoPanel');
+            panel.classList.toggle('active');
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadConcepts();
+            loadQuiz();
+            loadVisualization();
+
+            // Enter key en búsqueda
+            document.getElementById('search-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') semanticSearch();
+            });
+        });
+
+        // Cargar conceptos disponibles
+        async function loadConcepts() {
+            try {
+                const response = await fetch('/api/lab/concepts');
+                const data = await response.json();
+                concepts = data.concepts || [];
+
+                // Llenar selectores
+                const selectA = document.getElementById('concept-a');
+                const selectB = document.getElementById('concept-b');
+
+                concepts.forEach(c => {
+                    selectA.innerHTML += `<option value="${c}">${c}</option>`;
+                    selectB.innerHTML += `<option value="${c}">${c}</option>`;
+                });
+            } catch (error) {
+                console.error('Error loading concepts:', error);
+            }
+        }
+
+        // Búsqueda semántica
+        async function semanticSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) return;
+
+            const statusEl = document.getElementById('search-status');
+            const resultsEl = document.getElementById('search-results');
+
+            statusEl.innerHTML = '<div class="status loading"><div class="spinner"></div>Buscando por significado...</div>';
+            resultsEl.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/lab/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+
+                const data = await response.json();
+                statusEl.innerHTML = '';
+
+                if (data.results && data.results.length > 0) {
+                    data.results.forEach((r, i) => {
+                        const item = document.createElement('div');
+                        item.className = 'result-item';
+                        item.style.animationDelay = `${i * 0.1}s`;
+                        item.innerHTML = `
+                            <span class="result-emoji">${r.emoji || '✨'}</span>
+                            <span class="result-name">${r.concept}</span>
+                            <div class="result-bar-container">
+                                <div class="result-bar" style="width: 0%"></div>
+                            </div>
+                            <span class="result-score">${r.similarity.toFixed(3)}</span>
+                        `;
+                        resultsEl.appendChild(item);
+
+                        // Animar barra después de insertar
+                        setTimeout(() => {
+                            item.querySelector('.result-bar').style.width = `${r.similarity * 100}%`;
+                        }, 100 + i * 100);
+                    });
+                } else {
+                    resultsEl.innerHTML = '<div class="empty-state"><p>No se encontraron resultados</p></div>';
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<div class="status error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Quiz
+        async function loadQuiz() {
+            const container = document.getElementById('quiz-container');
+
+            try {
+                const response = await fetch('/api/lab/quiz');
+                const data = await response.json();
+
+                if (data.error) {
+                    container.innerHTML = `<div class="empty-state"><p>${data.error}</p></div>`;
+                    return;
+                }
+
+                currentQuiz = data;
+
+                container.innerHTML = `
+                    <div class="quiz-question">¿Cuál es más similar a <span>"${data.base_concept}"</span>?</div>
+                    <div class="quiz-options">
+                        ${data.options.map(opt => `
+                            <button class="quiz-option" onclick="checkQuizAnswer('${opt}')">${opt}</button>
+                        `).join('')}
+                    </div>
+                    <div id="quiz-feedback"></div>
+                `;
+            } catch (error) {
+                container.innerHTML = `<div class="empty-state"><p>Error cargando quiz</p></div>`;
+            }
+        }
+
+        async function checkQuizAnswer(answer) {
+            if (!currentQuiz) return;
+
+            const buttons = document.querySelectorAll('.quiz-option');
+            const feedbackEl = document.getElementById('quiz-feedback');
+
+            // Deshabilitar botones
+            buttons.forEach(btn => btn.disabled = true);
+
+            try {
+                const response = await fetch('/api/lab/quiz/check', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        base: currentQuiz.base_concept,
+                        answer: answer,
+                        correct: currentQuiz.correct
+                    })
+                });
+
+                const data = await response.json();
+
+                // Marcar botones
+                buttons.forEach(btn => {
+                    if (btn.textContent === currentQuiz.correct) {
+                        btn.classList.add('correct');
+                    } else if (btn.textContent === answer && !data.correct) {
+                        btn.classList.add('incorrect');
+                    }
+                });
+
+                // Feedback
+                feedbackEl.className = `quiz-feedback ${data.correct ? 'success' : 'error'}`;
+                feedbackEl.textContent = data.message;
+
+                // Confetti si es correcto
+                if (data.correct) {
+                    createConfetti();
+                }
+            } catch (error) {
+                feedbackEl.className = 'quiz-feedback error';
+                feedbackEl.textContent = 'Error verificando respuesta';
+            }
+        }
+
+        // Comparador
+        async function compareConcepts() {
+            const a = document.getElementById('concept-a').value;
+            const b = document.getElementById('concept-b').value;
+
+            if (!a || !b) return;
+
+            try {
+                const response = await fetch('/api/lab/similarity', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ a, b })
+                });
+
+                const data = await response.json();
+
+                if (data.similarity !== undefined) {
+                    document.getElementById('sim-value').textContent = data.similarity.toFixed(3);
+                    document.getElementById('sim-meter').style.width = `${data.similarity * 100}%`;
+                }
+            } catch (error) {
+                console.error('Error comparing:', error);
+            }
+        }
+
+        // Visualización 2D
+        async function loadVisualization() {
+            const container = document.getElementById('viz-container');
+            const statusEl = document.getElementById('viz-status');
+
+            statusEl.innerHTML = '<div class="status loading"><div class="spinner"></div>Generando embeddings y reduciendo dimensiones...</div>';
+
+            try {
+                const response = await fetch('/api/lab/visualization');
+                const data = await response.json();
+
+                statusEl.innerHTML = '';
+
+                if (data.error) {
+                    container.innerHTML = `<div class="empty-state"><p>${data.error}</p></div>`;
+                    return;
+                }
+
+                if (!data.points || data.points.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><p>No hay suficientes conceptos</p></div>';
+                    return;
+                }
+
+                // Limpiar container
+                container.innerHTML = '';
+
+                // Calcular bounds
+                const xs = data.points.map(p => p.x);
+                const ys = data.points.map(p => p.y);
+                const minX = Math.min(...xs), maxX = Math.max(...xs);
+                const minY = Math.min(...ys), maxY = Math.max(...ys);
+                const rangeX = maxX - minX || 1;
+                const rangeY = maxY - minY || 1;
+
+                // Crear nodos
+                data.points.forEach((point, i) => {
+                    const node = document.createElement('div');
+                    node.className = 'viz-node';
+                    node.textContent = point.concept;
+                    node.style.background = point.color || 'var(--gold)';
+                    node.style.animationDelay = `${i * 0.05}s`;
+
+                    // Normalizar posición
+                    const x = ((point.x - minX) / rangeX) * 80 + 10; // 10-90%
+                    const y = ((point.y - minY) / rangeY) * 80 + 10;
+
+                    node.style.left = `${x}%`;
+                    node.style.top = `${y}%`;
+                    node.style.transform = 'translate(-50%, -50%)';
+
+                    container.appendChild(node);
+                });
+
+                statusEl.innerHTML = `<div class="status success">✓ ${data.points.length} conceptos en ${data.clusters?.length || 0} clusters</div>`;
+            } catch (error) {
+                statusEl.innerHTML = `<div class="status error">Error: ${error.message}</div>`;
+                container.innerHTML = '<div class="empty-state"><p>Error cargando visualización</p></div>';
+            }
+        }
+
+        // Confetti
+        function createConfetti() {
+            const colors = ['#ffa500', '#ffb733', '#3b82f6', '#10b981', '#8b5cf6'];
+
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+                document.body.appendChild(confetti);
+
+                // Animación
+                const animation = confetti.animate([
+                    { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translateY(100vh) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                ], {
+                    duration: 2000 + Math.random() * 2000,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                });
+
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+    </script>
+</body>
+</html>

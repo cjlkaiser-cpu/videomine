@@ -6,11 +6,12 @@ Extrae pepitas de conocimiento de videos de YouTube usando IA. Metodología **mi
 
 ```
 🔦 Tunnel      → Scanner (yt-dlp descubre el video)
-⛏️  Pickaxe     → Extractor (subtítulos/Whisper)
+⛏️  Pickaxe     → Extractor (subtitulos/Whisper)
 💎 Gemcutter   → Clasificador (LLM resume y estructura)
 🏛️  Vault       → Base de datos (nuggets.json + HTML)
 🧭 Compass     → Interfaz web (Flask)
-🗺️  Cartographer → Grafo de conocimiento (conexiones semánticas)
+🗺️  Cartographer → Grafo de conocimiento (conexiones semanticas)
+🔬 Prospector  → Laboratorio de embeddings (busqueda semantica)
 ```
 
 ## Instalación
@@ -28,7 +29,8 @@ brew install ffmpeg  # Requerido por whisper
 - Python 3.9+
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp) - Descarga de videos/subtítulos
 - [Ollama](https://ollama.ai) - LLM local (opcional, recomendado)
-- [Claude Code CLI](https://claude.ai/code) - Alternativa con suscripción Pro/Max
+- [Claude Code CLI](https://claude.ai/code) - Alternativa con suscripcion Pro/Max
+- nomic-embed-text (modelo Ollama) - Para Lab de embeddings: `ollama pull nomic-embed-text`
 
 ## Uso Rápido
 
@@ -73,13 +75,15 @@ videomine/
 ├── cartographer/      # 🗺️ Grafo de conocimiento
 │   ├── __init__.py
 │   ├── extractor.py   # Extrae conceptos con Claude Code
-│   └── graph.py       # KnowledgeGraph
+│   ├── graph.py       # KnowledgeGraph
+│   └── embeddings_lab.py  # 🔬 Lab de embeddings
 ├── vault/             # 🏛️ Base de datos
 │   └── __init__.py
 ├── compass/           # 🧭 Interfaz web
 │   └── templates/
 │       ├── index.html
-│       └── nugget.html
+│       ├── nugget.html
+│       └── lab.html       # 🔬 Laboratorio de embeddings
 ├── vault/             # Output de nuggets
 │   ├── index.html
 │   ├── nuggets.json
@@ -128,6 +132,13 @@ videomine/
 | `/api/cartographer/concept/<name>` | GET | Info de un concepto |
 | `/api/cartographer/related/<id>` | GET | Videos relacionados |
 | `/vault/graph` | GET | Vista interactiva del Knowledge Graph |
+| `/lab` | GET | Laboratorio de embeddings |
+| `/api/lab/concepts` | GET | Lista de conceptos del grafo |
+| `/api/lab/search` | POST | Busqueda semantica `{query}` |
+| `/api/lab/similarity` | POST | Similitud entre conceptos `{concept_a, concept_b}` |
+| `/api/lab/quiz` | GET | Nueva pregunta de quiz |
+| `/api/lab/quiz/check` | POST | Verificar respuesta `{base, answer, correct}` |
+| `/api/lab/visualization` | GET | Datos para grafico 2D |
 
 ## Configuración
 
@@ -174,6 +185,23 @@ python videomine.py --rebuild-graph
 
 # Abrir visualización
 python videomine.py --graph
+```
+
+## Laboratorio de Embeddings (Prospector)
+
+Experimenta con busqueda semantica usando `nomic-embed-text`:
+
+- **Busqueda semantica**: Encuentra conceptos por significado, no por palabras exactas
+- **Quiz de similitud**: Adivina que conceptos son mas similares
+- **Comparador**: Visualiza similitud entre dos conceptos (0-1)
+- **Mapa 2D**: Visualizacion espacial de conceptos por clusters
+
+```bash
+# Instalar modelo de embeddings
+ollama pull nomic-embed-text
+
+# Abrir Lab en navegador
+open http://localhost:5555/lab
 ```
 
 ## Estructura de un Nugget
