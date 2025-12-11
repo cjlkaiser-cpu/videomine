@@ -2,6 +2,139 @@
 
 Mejoras planificadas para VideoMine.
 
+## Fase 4: Cartographer - Grafo de Conocimiento (Pendiente)
+
+Sistema de conexión semántica entre videos, estilo Obsidian. Grafo por **conceptos** donde cada nodo es un concepto y los videos son fuentes que lo alimentan.
+
+### Visión
+
+```
+        ┌─────────┐
+        │ Python  │◄────── Video A, Video C, Video F
+        └────┬────┘
+             │
+    ┌────────┼────────┐
+    ▼        ▼        ▼
+┌───────┐ ┌─────┐ ┌──────┐
+│Pandas │ │Flask│ │Django│
+└───┬───┘ └──┬──┘ └──┬───┘
+    │        │       │
+    ▼        ▼       ▼
+┌──────────────────────┐
+│   Machine Learning   │◄────── Video B, Video D
+└──────────────────────┘
+```
+
+### Arquitectura
+
+```
+cartographer/
+├── __init__.py         # Orquestador principal
+├── extractor.py        # Extrae conceptos de nuggets (Claude Code)
+├── graph.py            # Gestiona grafo NetworkX
+├── similarity.py       # Calcula relaciones entre conceptos
+└── data/
+    ├── concepts.json   # Conceptos extraídos por video
+    ├── graph.json      # Grafo completo (nodos + aristas)
+    └── clusters.json   # Agrupaciones temáticas
+```
+
+### Flujo de trabajo
+
+#### Fase 1: Extracción (al minar o batch)
+
+```
+Nugget ──► Claude Code ──► Lista de conceptos + relaciones
+
+Prompt: "Extrae conceptos clave y sus relaciones jerárquicas"
+
+Output:
+{
+  "concepts": [
+    {"name": "Python", "type": "lenguaje", "importance": 1.0},
+    {"name": "Pandas", "type": "libreria", "parent": "Python"},
+    {"name": "DataFrame", "type": "concepto", "parent": "Pandas"}
+  ],
+  "relations": [
+    {"from": "Pandas", "to": "Machine Learning", "type": "usado_en"}
+  ]
+}
+```
+
+#### Fase 2: Unificación
+
+```
+Problema: "Python" vs "python" vs "Python 3"
+
+Solución: Claude Code normaliza y agrupa sinónimos
+
+{
+  "canonical": "Python",
+  "aliases": ["python", "Python 3", "Python3", "py"],
+  "sources": ["VIDEO_A", "VIDEO_C", "VIDEO_F"]
+}
+```
+
+#### Fase 3: Grafo
+
+- **Nodos**: Conceptos (tamaño = # de videos que lo mencionan)
+- **Color por tipo**: lenguaje / librería / concepto / herramienta
+- **Aristas jerárquicas** (parent-child): línea sólida
+- **Aristas semánticas** (relacionado): línea punteada
+- **Grosor** = fuerza de relación
+
+#### Fase 4: Visualización (/vault/graph)
+
+- Búsqueda de conceptos
+- Filtro por tipo
+- Click en nodo → Panel lateral con:
+  - Definición del concepto
+  - Videos que lo mencionan (links)
+  - Conceptos relacionados
+
+### Endpoints nuevos
+
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/api/cartographer/extract/<id>` | POST | Extraer conceptos de un nugget |
+| `/api/cartographer/rebuild` | POST | Reconstruir grafo completo |
+| `/api/cartographer/graph` | GET | Obtener grafo JSON |
+| `/api/cartographer/concept/<name>` | GET | Info de un concepto |
+| `/vault/graph` | GET | Vista HTML del grafo |
+
+### Comandos CLI nuevos
+
+```bash
+# Extraer conceptos de un video específico
+python videomine.py --map VIDEO_ID
+
+# Reconstruir grafo completo (todos los nuggets)
+python videomine.py --rebuild-graph
+
+# Abrir vista de grafo en navegador
+python videomine.py --graph
+```
+
+### Fases de implementación
+
+| Fase | Descripción | Dependencias |
+|------|-------------|--------------|
+| **4.1** | Crear `cartographer/extractor.py` - Extracción con Claude Code | - |
+| **4.2** | Crear `cartographer/graph.py` - Gestión del grafo | 4.1 |
+| **4.3** | Endpoint `/api/cartographer/graph` | 4.2 |
+| **4.4** | Template `vault/graph.html` con D3.js | 4.3 |
+| **4.5** | Integrar en pipeline de minería | 4.1-4.4 |
+| **4.6** | Panel lateral en nugget.html (relacionados) | 4.5 |
+
+### Tecnologías
+
+- **Extracción semántica**: Claude Code CLI
+- **Grafo**: NetworkX + JSON
+- **Visualización**: D3.js force-directed
+- **Almacenamiento**: JSON (concepts.json, graph.json)
+
+---
+
 ## Fase 3: Profundizar con IA (Pendiente)
 
 Boton que genera una ficha de estudio completa para un punto clave:
