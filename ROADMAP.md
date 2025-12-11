@@ -2,7 +2,7 @@
 
 Mejoras planificadas para VideoMine.
 
-## Fase 4: Cartographer - Grafo de Conocimiento (Pendiente)
+## Fase 4: Cartographer - Grafo de Conocimiento (Completada v0.3.0)
 
 Sistema de conexión semántica entre videos, estilo Obsidian. Grafo por **conceptos** donde cada nodo es un concepto y los videos son fuentes que lo alimentan.
 
@@ -119,12 +119,12 @@ python videomine.py --graph
 
 | Fase | Descripción | Dependencias |
 |------|-------------|--------------|
-| **4.1** | Crear `cartographer/extractor.py` - Extracción con Claude Code | - |
-| **4.2** | Crear `cartographer/graph.py` - Gestión del grafo | 4.1 |
-| **4.3** | Endpoint `/api/cartographer/graph` | 4.2 |
-| **4.4** | Template `vault/graph.html` con D3.js | 4.3 |
-| **4.5** | Integrar en pipeline de minería | 4.1-4.4 |
-| **4.6** | Panel lateral en nugget.html (relacionados) | 4.5 |
+| **4.1** | ~~Crear `cartographer/extractor.py` - Extracción con Claude Code~~ | ✅ |
+| **4.2** | ~~Crear `cartographer/graph.py` - Gestión del grafo~~ | ✅ |
+| **4.3** | ~~Endpoint `/api/cartographer/graph`~~ | ✅ |
+| **4.4** | ~~Template `vault/graph.html` con D3.js~~ | ✅ |
+| **4.5** | ~~Integrar en pipeline de minería~~ | ✅ |
+| **4.6** | Panel lateral en nugget.html (relacionados) | Pendiente |
 
 ### Tecnologías
 
@@ -204,4 +204,4 @@ Boton que genera una ficha de estudio completa para un punto clave:
 
 ---
 
-> Ultima actualizacion: 2024-12-11
+> Ultima actualizacion: 2024-12-11 (v0.3.0 Cartographer)

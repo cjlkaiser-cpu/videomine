@@ -2,6 +2,46 @@
 
 Todos los cambios notables en VideoMine.
 
+## [0.3.0] - 2024-12-11 "Cartographer"
+
+### Nuevas Funciones
+
+- **Knowledge Graph**: Sistema de conexion semantica entre videos estilo Obsidian
+  - Grafo por conceptos (no por videos) - cada concepto es un nodo
+  - Extraccion automatica de conceptos con Claude Code CLI
+  - Unificacion de sinonimos ("Python 3" = "python" = "py")
+  - Visualizacion D3.js force-directed interactiva
+  - Nodos coloreados por tipo (lenguaje/libreria/herramienta/concepto/metodologia)
+  - Tamaño de nodos segun cantidad de videos que lo mencionan
+  - Panel lateral con info del concepto y videos fuente
+  - Busqueda de conceptos en tiempo real
+  - Videos relacionados por conceptos compartidos
+
+- **Nuevo modulo `cartographer/`**:
+  - `extractor.py`: Extrae conceptos de nuggets usando Claude Code
+  - `graph.py`: KnowledgeGraph con persistencia JSON
+  - `__init__.py`: API publica del modulo
+
+- **Nuevos endpoints API**:
+  - `GET /api/cartographer/graph` - Grafo en formato D3.js
+  - `POST /api/cartographer/rebuild` - Reconstruir grafo completo
+  - `POST /api/cartographer/extract/<id>` - Extraer conceptos de un video
+  - `GET /api/cartographer/concept/<name>` - Info de un concepto
+  - `GET /api/cartographer/related/<id>` - Videos relacionados
+  - `GET /vault/graph` - Vista HTML del grafo
+
+- **Nuevos comandos CLI**:
+  - `--map ID`: Extraer conceptos de un video al grafo
+  - `--rebuild-graph`: Reconstruir grafo completo desde todos los nuggets
+  - `--graph`: Abrir vista del grafo en navegador
+
+### Mejoras
+
+- Link "Knowledge Graph" en header del Vault
+- Leyenda de colores en vista del grafo
+
+---
+
 ## [0.2.0] - 2024-12-11
 
 ### Nuevas Funciones

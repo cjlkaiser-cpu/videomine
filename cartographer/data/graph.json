@@ -1,0 +1,1179 @@
+{
+  "concepts": {
+    "Claude Code": {
+      "name": "Claude Code",
+      "type": "herramienta",
+      "importance": 1.0,
+      "parent": null,
+      "sources": [
+        "Kf5-HWJPTIE",
+        "luqKnexhpFs",
+        "kFpLzCVLA20"
+      ],
+      "aliases": []
+    },
+    "Skill": {
+      "name": "Skill",
+      "type": "patron",
+      "importance": 0.95,
+      "parent": "Claude Code",
+      "sources": [
+        "kFpLzCVLA20"
+      ],
+      "aliases": []
+    },
+    "Sub-agent": {
+      "name": "Sub-agent",
+      "type": "patron",
+      "importance": 0.85,
+      "parent": "Claude Code",
+      "sources": [
+        "Kf5-HWJPTIE",
+        "kFpLzCVLA20"
+      ],
+      "aliases": []
+    },
+    "MCP Server": {
+      "name": "MCP Server",
+      "type": "herramienta",
+      "importance": 0.8,
+      "parent": null,
+      "sources": [
+        "Kf5-HWJPTIE",
+        "kFpLzCVLA20"
+      ],
+      "aliases": []
+    },
+    "Slash Command": {
+      "name": "Slash Command",
+      "type": "patron",
+      "importance": 0.7,
+      "parent": "Claude Code",
+      "sources": [
+        "kFpLzCVLA20"
+      ],
+      "aliases": []
+    },
+    "Progressive Disclosure": {
+      "name": "Progressive Disclosure",
+      "type": "patron",
+      "importance": 0.75,
+      "parent": null,
+      "sources": [
+        "kFpLzCVLA20"
+      ],
+      "aliases": []
+    },
+    "Context Window": {
+      "name": "Context Window",
+      "type": "concepto",
+      "importance": 0.9,
+      "parent": null,
+      "sources": [
+        "Kf5-HWJPTIE",
+        "p0mrXfwAbCg",
+        "kFpLzCVLA20"
+      ],
+      "aliases": []
+    },
+    "Git Worktree": {
+      "name": "Git Worktree",
+      "type": "herramienta",
+      "importance": 0.6,
+      "parent": "Git",
+      "sources": [
+        "kFpLzCVLA20"
+      ],
+      "aliases": []
+    },
+    "Git": {
+      "name": "Git",
+      "type": "herramienta",
+      "importance": 1.0,
+      "parent": null,
+      "sources": [
+        "VdGzPZ31ts8",
+        "kFpLzCVLA20"
+      ],
+      "aliases": []
+    },
+    "Modularidad": {
+      "name": "Modularidad",
+      "type": "concepto",
+      "importance": 0.7,
+      "parent": null,
+      "sources": [
+        "luqKnexhpFs",
+        "kFpLzCVLA20"
+      ],
+      "aliases": []
+    },
+    "Composabilidad": {
+      "name": "Composabilidad",
+      "type": "concepto",
+      "importance": 0.65,
+      "parent": null,
+      "sources": [
+        "kFpLzCVLA20"
+      ],
+      "aliases": []
+    },
+    "Agente IA": {
+      "name": "Agente IA",
+      "type": "concepto",
+      "importance": 0.9,
+      "parent": null,
+      "sources": [
+        "Kf5-HWJPTIE",
+        "kFpLzCVLA20"
+      ],
+      "aliases": []
+    },
+    "Desarrollo Paralelo": {
+      "name": "Desarrollo Paralelo",
+      "type": "metodologia",
+      "importance": 0.55,
+      "parent": null,
+      "sources": [
+        "kFpLzCVLA20"
+      ],
+      "aliases": []
+    },
+    "Orchestrator Agent": {
+      "name": "Orchestrator Agent",
+      "type": "patron",
+      "importance": 1.0,
+      "parent": null,
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "Multi-Agent Orchestration": {
+      "name": "Multi-Agent Orchestration",
+      "type": "metodologia",
+      "importance": 0.95,
+      "parent": null,
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "Core Four": {
+      "name": "Core Four",
+      "type": "concepto",
+      "importance": 0.9,
+      "parent": "Orchestrator Agent",
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "Model": {
+      "name": "Model",
+      "type": "concepto",
+      "importance": 0.8,
+      "parent": "Core Four",
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "Prompt": {
+      "name": "Prompt",
+      "type": "concepto",
+      "importance": 0.8,
+      "parent": "Core Four",
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "Tools": {
+      "name": "Tools",
+      "type": "concepto",
+      "importance": 0.8,
+      "parent": "Core Four",
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "Single Interface Pattern": {
+      "name": "Single Interface Pattern",
+      "type": "patron",
+      "importance": 0.85,
+      "parent": null,
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "Observability": {
+      "name": "Observability",
+      "type": "concepto",
+      "importance": 0.8,
+      "parent": "Multi-Agent Orchestration",
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "CRUD de Agentes": {
+      "name": "CRUD de Agentes",
+      "type": "metodologia",
+      "importance": 0.75,
+      "parent": "Multi-Agent Orchestration",
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "Agentic Engineer": {
+      "name": "Agentic Engineer",
+      "type": "concepto",
+      "importance": 0.7,
+      "parent": null,
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "Agente Especializado": {
+      "name": "Agente Especializado",
+      "type": "concepto",
+      "importance": 0.75,
+      "parent": "Multi-Agent Orchestration",
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "In-Loop": {
+      "name": "In-Loop",
+      "type": "concepto",
+      "importance": 0.6,
+      "parent": null,
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "Out-Loop": {
+      "name": "Out-Loop",
+      "type": "concepto",
+      "importance": 0.65,
+      "parent": null,
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "Herramientas Especializadas": {
+      "name": "Herramientas Especializadas",
+      "type": "herramienta",
+      "importance": 0.7,
+      "parent": "Tools",
+      "sources": [
+        "p0mrXfwAbCg"
+      ],
+      "aliases": []
+    },
+    "Context Engineering": {
+      "name": "Context Engineering",
+      "type": "metodologia",
+      "importance": 1.0,
+      "parent": null,
+      "sources": [
+        "Kf5-HWJPTIE"
+      ],
+      "aliases": []
+    },
+    "R&D Framework": {
+      "name": "R&D Framework",
+      "type": "metodologia",
+      "importance": 0.85,
+      "parent": "Context Engineering",
+      "sources": [
+        "Kf5-HWJPTIE"
+      ],
+      "aliases": []
+    },
+    "Context Priming": {
+      "name": "Context Priming",
+      "type": "patron",
+      "importance": 0.8,
+      "parent": "Context Engineering",
+      "sources": [
+        "Kf5-HWJPTIE"
+      ],
+      "aliases": []
+    },
+    "Custom Slash Command": {
+      "name": "Custom Slash Command",
+      "type": "patron",
+      "importance": 0.75,
+      "parent": "Context Priming",
+      "sources": [
+        "Kf5-HWJPTIE"
+      ],
+      "aliases": []
+    },
+    "CLAUDE.md": {
+      "name": "CLAUDE.md",
+      "type": "concepto",
+      "importance": 0.7,
+      "parent": null,
+      "sources": [
+        "Kf5-HWJPTIE"
+      ],
+      "aliases": []
+    },
+    "System Prompt": {
+      "name": "System Prompt",
+      "type": "concepto",
+      "importance": 0.65,
+      "parent": null,
+      "sources": [
+        "Kf5-HWJPTIE"
+      ],
+      "aliases": []
+    },
+    "Agentic Prompt Format": {
+      "name": "Agentic Prompt Format",
+      "type": "patron",
+      "importance": 0.6,
+      "parent": "Context Priming",
+      "sources": [
+        "Kf5-HWJPTIE"
+      ],
+      "aliases": []
+    },
+    "Token": {
+      "name": "Token",
+      "type": "concepto",
+      "importance": 0.55,
+      "parent": "Context Window",
+      "sources": [
+        "Kf5-HWJPTIE"
+      ],
+      "aliases": []
+    },
+    "Agentic Prompt Engineering": {
+      "name": "Agentic Prompt Engineering",
+      "type": "metodologia",
+      "importance": 1.0,
+      "parent": null,
+      "sources": [
+        "luqKnexhpFs"
+      ],
+      "aliases": []
+    },
+    "Stakeholder Trifecta": {
+      "name": "Stakeholder Trifecta",
+      "type": "concepto",
+      "importance": 0.85,
+      "parent": "Agentic Prompt Engineering",
+      "sources": [
+        "luqKnexhpFs"
+      ],
+      "aliases": []
+    },
+    "Workflow Section": {
+      "name": "Workflow Section",
+      "type": "patron",
+      "importance": 0.9,
+      "parent": "Composable Section",
+      "sources": [
+        "luqKnexhpFs"
+      ],
+      "aliases": []
+    },
+    "Composable Section": {
+      "name": "Composable Section",
+      "type": "patron",
+      "importance": 0.85,
+      "parent": "Agentic Prompt Engineering",
+      "sources": [
+        "luqKnexhpFs"
+      ],
+      "aliases": []
+    },
+    "Variable": {
+      "name": "Variable",
+      "type": "concepto",
+      "importance": 0.75,
+      "parent": "Composable Section",
+      "sources": [
+        "luqKnexhpFs"
+      ],
+      "aliases": []
+    },
+    "Static Variable": {
+      "name": "Static Variable",
+      "type": "concepto",
+      "importance": 0.6,
+      "parent": "Variable",
+      "sources": [
+        "luqKnexhpFs"
+      ],
+      "aliases": []
+    },
+    "Dynamic Variable": {
+      "name": "Dynamic Variable",
+      "type": "concepto",
+      "importance": 0.65,
+      "parent": "Variable",
+      "sources": [
+        "luqKnexhpFs"
+      ],
+      "aliases": []
+    },
+    "Metadata Section": {
+      "name": "Metadata Section",
+      "type": "patron",
+      "importance": 0.6,
+      "parent": "Composable Section",
+      "sources": [
+        "luqKnexhpFs"
+      ],
+      "aliases": []
+    },
+    "Instructions Section": {
+      "name": "Instructions Section",
+      "type": "patron",
+      "importance": 0.7,
+      "parent": "Composable Section",
+      "sources": [
+        "luqKnexhpFs"
+      ],
+      "aliases": []
+    },
+    "Report Section": {
+      "name": "Report Section",
+      "type": "patron",
+      "importance": 0.65,
+      "parent": "Composable Section",
+      "sources": [
+        "luqKnexhpFs"
+      ],
+      "aliases": []
+    },
+    "Force Multiplier": {
+      "name": "Force Multiplier",
+      "type": "concepto",
+      "importance": 0.7,
+      "parent": null,
+      "sources": [
+        "luqKnexhpFs"
+      ],
+      "aliases": []
+    },
+    "Agente de IA": {
+      "name": "Agente de IA",
+      "type": "concepto",
+      "importance": 0.8,
+      "parent": null,
+      "sources": [
+        "luqKnexhpFs"
+      ],
+      "aliases": []
+    },
+    "Control de Versiones": {
+      "name": "Control de Versiones",
+      "type": "concepto",
+      "importance": 0.9,
+      "parent": null,
+      "sources": [
+        "VdGzPZ31ts8"
+      ],
+      "aliases": []
+    },
+    "Sistema Distribuido": {
+      "name": "Sistema Distribuido",
+      "type": "concepto",
+      "importance": 0.85,
+      "parent": "Control de Versiones",
+      "sources": [
+        "VdGzPZ31ts8"
+      ],
+      "aliases": []
+    },
+    "Sistema Centralizado": {
+      "name": "Sistema Centralizado",
+      "type": "concepto",
+      "importance": 0.6,
+      "parent": "Control de Versiones",
+      "sources": [
+        "VdGzPZ31ts8"
+      ],
+      "aliases": []
+    },
+    "Repositorio": {
+      "name": "Repositorio",
+      "type": "concepto",
+      "importance": 0.8,
+      "parent": "Git",
+      "sources": [
+        "VdGzPZ31ts8"
+      ],
+      "aliases": []
+    },
+    "Commit": {
+      "name": "Commit",
+      "type": "concepto",
+      "importance": 0.85,
+      "parent": "Git",
+      "sources": [
+        "VdGzPZ31ts8"
+      ],
+      "aliases": []
+    },
+    "Rollback": {
+      "name": "Rollback",
+      "type": "concepto",
+      "importance": 0.7,
+      "parent": "Git",
+      "sources": [
+        "VdGzPZ31ts8"
+      ],
+      "aliases": []
+    },
+    "Historial de Código": {
+      "name": "Historial de Código",
+      "type": "concepto",
+      "importance": 0.75,
+      "parent": "Control de Versiones",
+      "sources": [
+        "VdGzPZ31ts8"
+      ],
+      "aliases": []
+    },
+    "Git Bash": {
+      "name": "Git Bash",
+      "type": "herramienta",
+      "importance": 0.5,
+      "parent": null,
+      "sources": [
+        "VdGzPZ31ts8"
+      ],
+      "aliases": []
+    },
+    "Terminal": {
+      "name": "Terminal",
+      "type": "herramienta",
+      "importance": 0.6,
+      "parent": null,
+      "sources": [
+        "VdGzPZ31ts8"
+      ],
+      "aliases": []
+    },
+    "Windows": {
+      "name": "Windows",
+      "type": "concepto",
+      "importance": 0.3,
+      "parent": null,
+      "sources": [
+        "VdGzPZ31ts8"
+      ],
+      "aliases": []
+    }
+  },
+  "relations": [
+    {
+      "from": "Skill",
+      "to": "Context Window",
+      "type": "usa",
+      "strength": 0.9,
+      "sources": [
+        "kFpLzCVLA20"
+      ]
+    },
+    {
+      "from": "Skill",
+      "to": "Progressive Disclosure",
+      "type": "implementa",
+      "strength": 0.95,
+      "sources": [
+        "kFpLzCVLA20"
+      ]
+    },
+    {
+      "from": "Skill",
+      "to": "Slash Command",
+      "type": "alternativa",
+      "strength": 0.7,
+      "sources": [
+        "kFpLzCVLA20"
+      ]
+    },
+    {
+      "from": "Skill",
+      "to": "MCP Server",
+      "type": "alternativa",
+      "strength": 0.6,
+      "sources": [
+        "kFpLzCVLA20"
+      ]
+    },
+    {
+      "from": "Skill",
+      "to": "Sub-agent",
+      "type": "usa",
+      "strength": 0.7,
+      "sources": [
+        "kFpLzCVLA20"
+      ]
+    },
+    {
+      "from": "Skill",
+      "to": "Modularidad",
+      "type": "implementa",
+      "strength": 0.85,
+      "sources": [
+        "kFpLzCVLA20"
+      ]
+    },
+    {
+      "from": "Skill",
+      "to": "Composabilidad",
+      "type": "implementa",
+      "strength": 0.8,
+      "sources": [
+        "kFpLzCVLA20"
+      ]
+    },
+    {
+      "from": "Sub-agent",
+      "to": "Context Window",
+      "type": "relacionado",
+      "strength": 0.85,
+      "sources": [
+        "Kf5-HWJPTIE",
+        "kFpLzCVLA20"
+      ]
+    },
+    {
+      "from": "Sub-agent",
+      "to": "Desarrollo Paralelo",
+      "type": "usa",
+      "strength": 0.8,
+      "sources": [
+        "kFpLzCVLA20"
+      ]
+    },
+    {
+      "from": "Sub-agent",
+      "to": "Git Worktree",
+      "type": "usa",
+      "strength": 0.75,
+      "sources": [
+        "kFpLzCVLA20"
+      ]
+    },
+    {
+      "from": "MCP Server",
+      "to": "Context Window",
+      "type": "usa",
+      "strength": 0.7,
+      "sources": [
+        "Kf5-HWJPTIE",
+        "kFpLzCVLA20"
+      ]
+    },
+    {
+      "from": "Claude Code",
+      "to": "Agente IA",
+      "type": "es_parte_de",
+      "strength": 0.9,
+      "sources": [
+        "Kf5-HWJPTIE",
+        "kFpLzCVLA20"
+      ]
+    },
+    {
+      "from": "Git Worktree",
+      "to": "Desarrollo Paralelo",
+      "type": "implementa",
+      "strength": 0.8,
+      "sources": [
+        "kFpLzCVLA20"
+      ]
+    },
+    {
+      "from": "Orchestrator Agent",
+      "to": "Multi-Agent Orchestration",
+      "type": "implementa",
+      "strength": 0.95,
+      "sources": [
+        "p0mrXfwAbCg"
+      ]
+    },
+    {
+      "from": "Orchestrator Agent",
+      "to": "Single Interface Pattern",
+      "type": "implementa",
+      "strength": 0.9,
+      "sources": [
+        "p0mrXfwAbCg"
+      ]
+    },
+    {
+      "from": "Core Four",
+      "to": "Agente Especializado",
+      "type": "es_parte_de",
+      "strength": 0.9,
+      "sources": [
+        "p0mrXfwAbCg"
+      ]
+    },
+    {
+      "from": "Orchestrator Agent",
+      "to": "CRUD de Agentes",
+      "type": "usa",
+      "strength": 0.85,
+      "sources": [
+        "p0mrXfwAbCg"
+      ]
+    },
+    {
+      "from": "Orchestrator Agent",
+      "to": "Observability",
+      "type": "requiere",
+      "strength": 0.85,
+      "sources": [
+        "p0mrXfwAbCg"
+      ]
+    },
+    {
+      "from": "Agentic Engineer",
+      "to": "Orchestrator Agent",
+      "type": "usa",
+      "strength": 0.8,
+      "sources": [
+        "p0mrXfwAbCg"
+      ]
+    },
+    {
+      "from": "Context Window",
+      "to": "Orchestrator Agent",
+      "type": "relacionado",
+      "strength": 0.75,
+      "sources": [
+        "p0mrXfwAbCg"
+      ]
+    },
+    {
+      "from": "Agente Especializado",
+      "to": "Herramientas Especializadas",
+      "type": "usa",
+      "strength": 0.8,
+      "sources": [
+        "p0mrXfwAbCg"
+      ]
+    },
+    {
+      "from": "In-Loop",
+      "to": "Out-Loop",
+      "type": "alternativa",
+      "strength": 0.7,
+      "sources": [
+        "p0mrXfwAbCg"
+      ]
+    },
+    {
+      "from": "Out-Loop",
+      "to": "Orchestrator Agent",
+      "type": "requiere",
+      "strength": 0.75,
+      "sources": [
+        "p0mrXfwAbCg"
+      ]
+    },
+    {
+      "from": "Observability",
+      "to": "CRUD de Agentes",
+      "type": "relacionado",
+      "strength": 0.7,
+      "sources": [
+        "p0mrXfwAbCg"
+      ]
+    },
+    {
+      "from": "Multi-Agent Orchestration",
+      "to": "Agente Especializado",
+      "type": "usa",
+      "strength": 0.85,
+      "sources": [
+        "p0mrXfwAbCg"
+      ]
+    },
+    {
+      "from": "Context Engineering",
+      "to": "Claude Code",
+      "type": "usa",
+      "strength": 0.95,
+      "sources": [
+        "Kf5-HWJPTIE"
+      ]
+    },
+    {
+      "from": "Context Engineering",
+      "to": "Context Window",
+      "type": "es_parte_de",
+      "strength": 0.9,
+      "sources": [
+        "Kf5-HWJPTIE"
+      ]
+    },
+    {
+      "from": "R&D Framework",
+      "to": "Context Window",
+      "type": "implementa",
+      "strength": 0.85,
+      "sources": [
+        "Kf5-HWJPTIE"
+      ]
+    },
+    {
+      "from": "Context Priming",
+      "to": "Custom Slash Command",
+      "type": "usa",
+      "strength": 0.85,
+      "sources": [
+        "Kf5-HWJPTIE"
+      ]
+    },
+    {
+      "from": "Sub-agent",
+      "to": "System Prompt",
+      "type": "usa",
+      "strength": 0.75,
+      "sources": [
+        "Kf5-HWJPTIE"
+      ]
+    },
+    {
+      "from": "CLAUDE.md",
+      "to": "Context Window",
+      "type": "usa",
+      "strength": 0.7,
+      "sources": [
+        "Kf5-HWJPTIE"
+      ]
+    },
+    {
+      "from": "Context Priming",
+      "to": "CLAUDE.md",
+      "type": "alternativa",
+      "strength": 0.75,
+      "sources": [
+        "Kf5-HWJPTIE"
+      ]
+    },
+    {
+      "from": "Claude Code",
+      "to": "Sub-agent",
+      "type": "usa",
+      "strength": 0.8,
+      "sources": [
+        "Kf5-HWJPTIE"
+      ]
+    },
+    {
+      "from": "Agentic Prompt Format",
+      "to": "Context Priming",
+      "type": "implementa",
+      "strength": 0.65,
+      "sources": [
+        "Kf5-HWJPTIE"
+      ]
+    },
+    {
+      "from": "Token",
+      "to": "Context Window",
+      "type": "es_parte_de",
+      "strength": 0.9,
+      "sources": [
+        "Kf5-HWJPTIE"
+      ]
+    },
+    {
+      "from": "Agentic Prompt Engineering",
+      "to": "Claude Code",
+      "type": "usa",
+      "strength": 0.9,
+      "sources": [
+        "luqKnexhpFs"
+      ]
+    },
+    {
+      "from": "Agentic Prompt Engineering",
+      "to": "Stakeholder Trifecta",
+      "type": "implementa",
+      "strength": 0.85,
+      "sources": [
+        "luqKnexhpFs"
+      ]
+    },
+    {
+      "from": "Agentic Prompt Engineering",
+      "to": "Agente de IA",
+      "type": "requiere",
+      "strength": 0.9,
+      "sources": [
+        "luqKnexhpFs"
+      ]
+    },
+    {
+      "from": "Composable Section",
+      "to": "Modularidad",
+      "type": "implementa",
+      "strength": 0.8,
+      "sources": [
+        "luqKnexhpFs"
+      ]
+    },
+    {
+      "from": "Workflow Section",
+      "to": "Instructions Section",
+      "type": "relacionado",
+      "strength": 0.75,
+      "sources": [
+        "luqKnexhpFs"
+      ]
+    },
+    {
+      "from": "Workflow Section",
+      "to": "Agente de IA",
+      "type": "usa",
+      "strength": 0.85,
+      "sources": [
+        "luqKnexhpFs"
+      ]
+    },
+    {
+      "from": "Variable",
+      "to": "Workflow Section",
+      "type": "es_parte_de",
+      "strength": 0.7,
+      "sources": [
+        "luqKnexhpFs"
+      ]
+    },
+    {
+      "from": "Static Variable",
+      "to": "Dynamic Variable",
+      "type": "alternativa",
+      "strength": 0.6,
+      "sources": [
+        "luqKnexhpFs"
+      ]
+    },
+    {
+      "from": "Agentic Prompt Engineering",
+      "to": "Force Multiplier",
+      "type": "implementa",
+      "strength": 0.8,
+      "sources": [
+        "luqKnexhpFs"
+      ]
+    },
+    {
+      "from": "Report Section",
+      "to": "Workflow Section",
+      "type": "relacionado",
+      "strength": 0.65,
+      "sources": [
+        "luqKnexhpFs"
+      ]
+    },
+    {
+      "from": "Metadata Section",
+      "to": "Agente de IA",
+      "type": "usa",
+      "strength": 0.6,
+      "sources": [
+        "luqKnexhpFs"
+      ]
+    },
+    {
+      "from": "Git",
+      "to": "Control de Versiones",
+      "type": "implementa",
+      "strength": 1.0,
+      "sources": [
+        "VdGzPZ31ts8"
+      ]
+    },
+    {
+      "from": "Git",
+      "to": "Sistema Distribuido",
+      "type": "implementa",
+      "strength": 0.95,
+      "sources": [
+        "VdGzPZ31ts8"
+      ]
+    },
+    {
+      "from": "Sistema Distribuido",
+      "to": "Sistema Centralizado",
+      "type": "alternativa",
+      "strength": 0.8,
+      "sources": [
+        "VdGzPZ31ts8"
+      ]
+    },
+    {
+      "from": "Commit",
+      "to": "Historial de Código",
+      "type": "es_parte_de",
+      "strength": 0.9,
+      "sources": [
+        "VdGzPZ31ts8"
+      ]
+    },
+    {
+      "from": "Rollback",
+      "to": "Commit",
+      "type": "requiere",
+      "strength": 0.85,
+      "sources": [
+        "VdGzPZ31ts8"
+      ]
+    },
+    {
+      "from": "Rollback",
+      "to": "Historial de Código",
+      "type": "usa",
+      "strength": 0.8,
+      "sources": [
+        "VdGzPZ31ts8"
+      ]
+    },
+    {
+      "from": "Git",
+      "to": "Terminal",
+      "type": "usa",
+      "strength": 0.7,
+      "sources": [
+        "VdGzPZ31ts8"
+      ]
+    },
+    {
+      "from": "Git Bash",
+      "to": "Git",
+      "type": "es_parte_de",
+      "strength": 0.6,
+      "sources": [
+        "VdGzPZ31ts8"
+      ]
+    },
+    {
+      "from": "Git Bash",
+      "to": "Windows",
+      "type": "requiere",
+      "strength": 0.7,
+      "sources": [
+        "VdGzPZ31ts8"
+      ]
+    },
+    {
+      "from": "Git Bash",
+      "to": "Terminal",
+      "type": "implementa",
+      "strength": 0.65,
+      "sources": [
+        "VdGzPZ31ts8"
+      ]
+    },
+    {
+      "from": "Repositorio",
+      "to": "Sistema Distribuido",
+      "type": "es_parte_de",
+      "strength": 0.8,
+      "sources": [
+        "VdGzPZ31ts8"
+      ]
+    }
+  ],
+  "sources": {
+    "kFpLzCVLA20": [
+      "Claude Code",
+      "Skill",
+      "Sub-agent",
+      "MCP Server",
+      "Slash Command",
+      "Progressive Disclosure",
+      "Context Window",
+      "Git Worktree",
+      "Git",
+      "Modularidad",
+      "Composabilidad",
+      "Agente IA",
+      "Desarrollo Paralelo"
+    ],
+    "p0mrXfwAbCg": [
+      "Orchestrator Agent",
+      "Multi-Agent Orchestration",
+      "Core Four",
+      "Context Window",
+      "Model",
+      "Prompt",
+      "Tools",
+      "Single Interface Pattern",
+      "Observability",
+      "CRUD de Agentes",
+      "Agentic Engineer",
+      "Agente Especializado",
+      "In-Loop",
+      "Out-Loop",
+      "Herramientas Especializadas"
+    ],
+    "Kf5-HWJPTIE": [
+      "Context Engineering",
+      "Claude Code",
+      "Context Window",
+      "R&D Framework",
+      "Context Priming",
+      "Sub-agent",
+      "Custom Slash Command",
+      "MCP Server",
+      "CLAUDE.md",
+      "System Prompt",
+      "Agentic Prompt Format",
+      "Token",
+      "Agente IA"
+    ],
+    "luqKnexhpFs": [
+      "Agentic Prompt Engineering",
+      "Claude Code",
+      "Stakeholder Trifecta",
+      "Workflow Section",
+      "Composable Section",
+      "Variable",
+      "Static Variable",
+      "Dynamic Variable",
+      "Metadata Section",
+      "Instructions Section",
+      "Report Section",
+      "Force Multiplier",
+      "Agente de IA",
+      "Modularidad"
+    ],
+    "VdGzPZ31ts8": [
+      "Git",
+      "Control de Versiones",
+      "Sistema Distribuido",
+      "Sistema Centralizado",
+      "Repositorio",
+      "Commit",
+      "Rollback",
+      "Historial de Código",
+      "Git Bash",
+      "Terminal",
+      "Windows"
+    ]
+  }
+}

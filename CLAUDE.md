@@ -13,11 +13,12 @@
 ## Metodología minerOS
 
 ```
-🔦 Tunnel    → tunnel/__init__.py    (yt-dlp escanea video)
-⛏️  Pickaxe   → pickaxe.py           (extrae transcripción)
-💎 Gemcutter → gemcutter/__init__.py (LLM resume y estructura)
-🏛️  Vault     → vault/__init__.py    (almacena nuggets)
-🧭 Compass   → compass_server.py     (interfaz web Flask)
+🔦 Tunnel      → tunnel/__init__.py      (yt-dlp escanea video)
+⛏️  Pickaxe     → pickaxe.py             (extrae transcripción)
+💎 Gemcutter   → gemcutter/__init__.py   (LLM resume y estructura)
+🏛️  Vault       → vault/__init__.py      (almacena nuggets)
+🧭 Compass     → compass_server.py       (interfaz web Flask)
+🗺️  Cartographer → cartographer/          (grafo de conocimiento)
 ```
 
 ## Estructura
@@ -30,6 +31,10 @@ videomine/
 ├── pickaxe.py            # Utilidades
 ├── tunnel/               # Scanner
 ├── gemcutter/            # Clasificador LLM
+├── cartographer/         # Grafo de conocimiento
+│   ├── __init__.py       # API pública
+│   ├── extractor.py      # Extrae conceptos con Claude Code
+│   └── graph.py          # KnowledgeGraph
 ├── vault/                # DB + nuggets HTML
 │   ├── nuggets.json
 │   └── *.html
@@ -63,6 +68,11 @@ python videomine.py "URL" --claude-code
 
 # Eliminar nugget
 python videomine.py --delete VIDEO_ID
+
+# Grafo de conocimiento
+python videomine.py --rebuild-graph  # Reconstruir grafo
+python videomine.py --map VIDEO_ID   # Mapear un video
+python videomine.py --graph          # Abrir visualización
 ```
 
 ## Variables de entorno
@@ -88,6 +98,11 @@ python videomine.py --delete VIDEO_ID
 | `/api/expand` | POST | Expandir punto clave con Ollama |
 | `/api/concept-map/<id>` | GET | Mapa conceptual con Claude Code CLI |
 | `/api/export-html/<id>` | GET | HTML imprimible con campos de notas |
+| `/api/cartographer/graph` | GET | Grafo de conocimiento (D3.js) |
+| `/api/cartographer/rebuild` | POST | Reconstruir grafo completo |
+| `/api/cartographer/extract/<id>` | POST | Extraer conceptos de un video |
+| `/api/cartographer/related/<id>` | GET | Videos relacionados |
+| `/vault/graph` | GET | Vista interactiva del grafo |
 
 ## Contexto
 

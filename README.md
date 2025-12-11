@@ -5,11 +5,12 @@ Extrae pepitas de conocimiento de videos de YouTube usando IA. Metodología **mi
 ## Filosofía minerOS
 
 ```
-🔦 Tunnel    → Scanner (yt-dlp descubre el video)
-⛏️  Pickaxe   → Extractor (subtítulos/Whisper)
-💎 Gemcutter → Clasificador (LLM resume y estructura)
-🏛️  Vault     → Base de datos (nuggets.json + HTML)
-🧭 Compass   → Interfaz web (Flask)
+🔦 Tunnel      → Scanner (yt-dlp descubre el video)
+⛏️  Pickaxe     → Extractor (subtítulos/Whisper)
+💎 Gemcutter   → Clasificador (LLM resume y estructura)
+🏛️  Vault       → Base de datos (nuggets.json + HTML)
+🧭 Compass     → Interfaz web (Flask)
+🗺️  Cartographer → Grafo de conocimiento (conexiones semánticas)
 ```
 
 ## Instalación
@@ -69,6 +70,10 @@ videomine/
 │   └── __init__.py
 ├── gemcutter/         # 💎 Clasificador (LLM)
 │   └── __init__.py
+├── cartographer/      # 🗺️ Grafo de conocimiento
+│   ├── __init__.py
+│   ├── extractor.py   # Extrae conceptos con Claude Code
+│   └── graph.py       # KnowledgeGraph
 ├── vault/             # 🏛️ Base de datos
 │   └── __init__.py
 ├── compass/           # 🧭 Interfaz web
@@ -97,6 +102,9 @@ videomine/
 | `python videomine.py --server` | 🧭 Iniciar Compass (servidor web) |
 | `python videomine.py --delete VIDEO_ID` | 🗑️ Eliminar nugget |
 | `python videomine.py --finish VIDEO_ID` | ✅ Completar nugget pendiente |
+| `python videomine.py --map VIDEO_ID` | 🗺️ Extraer conceptos al grafo |
+| `python videomine.py --rebuild-graph` | 🗺️ Reconstruir grafo completo |
+| `python videomine.py --graph` | 🗺️ Abrir Knowledge Graph en navegador |
 
 ### API REST
 
@@ -114,6 +122,12 @@ videomine/
 | `/api/translate` | POST | Traducir texto con Ollama |
 | `/api/expand` | POST | Expandir punto clave con IA `{video_id, punto}` |
 | `/api/concept-map/<id>` | GET | Generar mapa conceptual con Claude Code |
+| `/api/cartographer/graph` | GET | Obtener grafo de conocimiento (D3.js) |
+| `/api/cartographer/rebuild` | POST | Reconstruir grafo completo |
+| `/api/cartographer/extract/<id>` | POST | Extraer conceptos de un video |
+| `/api/cartographer/concept/<name>` | GET | Info de un concepto |
+| `/api/cartographer/related/<id>` | GET | Videos relacionados |
+| `/vault/graph` | GET | Vista interactiva del Knowledge Graph |
 
 ## Configuración
 
@@ -142,6 +156,25 @@ python videomine.py --server
 3. **💎 Gemcutter** - LLM genera resumen estructurado (JSON)
 4. **🏛️ Vault** - Jinja2 genera HTML, guarda en DB
 5. **🧭 Compass** - Actualiza índice web
+6. **🗺️ Cartographer** - Extrae conceptos y construye grafo de conocimiento
+
+## Knowledge Graph (Cartographer)
+
+Sistema de conexión semántica entre videos estilo Obsidian:
+
+- **Grafo por conceptos**: Cada concepto es un nodo, los videos son fuentes
+- **Extracción automática**: Claude Code extrae conceptos de cada nugget
+- **Unificación de sinónimos**: "Python 3" = "python" = "py"
+- **Visualización D3.js**: Force-directed graph interactivo
+- **Panel lateral**: Click en nodo muestra videos fuente y conceptos relacionados
+
+```bash
+# Construir grafo desde todos los nuggets
+python videomine.py --rebuild-graph
+
+# Abrir visualización
+python videomine.py --graph
+```
 
 ## Estructura de un Nugget
 
