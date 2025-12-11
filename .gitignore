@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Vault data (nuggets personales)
+vault/nuggets.json
+vault/*.html
+!vault/__init__.py
+
+# Archivos temporales
+pending/
+*.log
+*.tmp
+
+# Modelos locales
+*.gguf
+*.bin

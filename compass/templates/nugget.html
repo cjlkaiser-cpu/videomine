@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }} - VideoMine</title>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --card: #16213e;
+            --accent: #0f3460;
+            --highlight: #ffa500;  /* Dorado minerOS */
+            --text: #eaeaea;
+            --muted: #8892a0;
+            --code-bg: #0d1117;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--highlight);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .meta {
+            display: flex;
+            gap: 1.5rem;
+            color: var(--muted);
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .meta a {
+            color: var(--highlight);
+            text-decoration: none;
+        }
+
+        .meta a:hover {
+            text-decoration: underline;
+        }
+
+        section {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        section h2 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .idea-principal {
+            border-left: 4px solid var(--highlight);
+            background: var(--accent);
+        }
+
+        .idea-principal p {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        ul li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        ul li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--highlight);
+        }
+
+        .codigo ul li::before {
+            content: "$";
+            color: #7ee787;
+        }
+
+        pre, code {
+            background: var(--code-bg);
+            border-radius: 6px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+
+        code {
+            padding: 0.2rem 0.4rem;
+        }
+
+        pre {
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 0.5rem 0;
+        }
+
+        .preguntas ul li::before {
+            content: "?";
+            color: #ffa657;
+        }
+
+        .glosario dl {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .glosario dt {
+            color: var(--highlight);
+            font-weight: 600;
+        }
+
+        .glosario dd {
+            margin-left: 1rem;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Botón Explícame más */
+        .expand-btn {
+            background: none;
+            border: 1px solid var(--accent);
+            color: var(--highlight);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .expand-btn:hover {
+            background: var(--accent);
+        }
+
+        .expand-btn:disabled {
+            opacity: 0.5;
+            cursor: wait;
+        }
+
+        .expand-btn.loading::after {
+            content: "...";
+            animation: dots 1s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+
+        /* Acordeón de expansión */
+        .expansion {
+            display: none;
+            background: var(--accent);
+            border-left: 3px solid var(--highlight);
+            padding: 1rem;
+            margin: 0.5rem 0 0.5rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .expansion.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .expansion p {
+            margin-bottom: 0.8rem;
+        }
+
+        .expansion p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Mapa conceptual */
+        .map-btn {
+            background: var(--accent);
+            border: 1px solid var(--highlight);
+            color: var(--highlight);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            transition: all 0.2s;
+        }
+
+        .map-btn:hover {
+            background: var(--highlight);
+            color: var(--bg);
+        }
+
+        .map-btn:disabled {
+            opacity: 0.5;
+            cursor: wait;
+        }
+
+        .concept-map {
+            display: none;
+            background: var(--bg);
+            border: 2px solid var(--highlight);
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95vw;
+            max-width: 1200px;
+            height: 85vh;
+            z-index: 1000;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .concept-map.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        .concept-map-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+        }
+
+        .concept-map-overlay.show {
+            display: block;
+        }
+
+        .concept-map svg {
+            width: 100%;
+            height: calc(100% - 60px);
+            display: block;
+        }
+
+        .concept-map .node {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .concept-map .node:hover circle {
+            filter: brightness(1.3);
+            transform: scale(1.1);
+        }
+
+        .concept-map .node circle {
+            stroke-width: 2;
+            transition: all 0.2s;
+        }
+
+        /* Colores por tipo */
+        .concept-map .node.tipo-concepto circle { fill: #3b82f6; stroke: #60a5fa; }
+        .concept-map .node.tipo-accion circle { fill: #22c55e; stroke: #4ade80; }
+        .concept-map .node.tipo-herramienta circle { fill: #f97316; stroke: #fb923c; }
+        .concept-map .node.tipo-default circle { fill: var(--accent); stroke: var(--highlight); }
+
+        /* Tamaños por importancia */
+        .concept-map .node.importancia-3 circle { r: 40; }
+        .concept-map .node.importancia-2 circle { r: 32; }
+        .concept-map .node.importancia-1 circle { r: 25; }
+
+        .concept-map .node text {
+            fill: var(--text);
+            font-size: 10px;
+            text-anchor: middle;
+            font-weight: 500;
+        }
+
+        .concept-map .edge {
+            fill: none;
+            opacity: 0.7;
+        }
+
+        /* Grosor por fuerza */
+        .concept-map .edge.fuerza-3 { stroke: var(--highlight); stroke-width: 3; opacity: 1; }
+        .concept-map .edge.fuerza-2 { stroke: var(--muted); stroke-width: 2; }
+        .concept-map .edge.fuerza-1 { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4; }
+
+        .concept-map .edge-label {
+            fill: var(--text);
+            font-size: 9px;
+            text-anchor: middle;
+            background: var(--card);
+        }
+
+        /* Leyenda */
+        .map-legend {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--muted);
+            flex-wrap: wrap;
+        }
+
+        .map-legend span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.concepto { background: #3b82f6; }
+        .legend-dot.accion { background: #22c55e; }
+        .legend-dot.herramienta { background: #f97316; }
+
+        /* Clusters */
+        .concept-map .cluster-bg {
+            fill: var(--accent);
+            opacity: 0.2;
+            stroke: var(--muted);
+            stroke-width: 1;
+            stroke-dasharray: 4;
+        }
+
+        .map-tooltip {
+            position: absolute;
+            background: var(--bg);
+            border: 1px solid var(--highlight);
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            max-width: 250px;
+            display: none;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .map-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--accent);
+            border: 1px solid var(--highlight);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .map-close:hover {
+            background: var(--highlight);
+            color: var(--bg);
+        }
+
+        .map-title {
+            font-size: 1.1rem;
+            color: var(--highlight);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.8rem;
+            padding: 1rem;
+        }
+
+        footer a {
+            color: var(--highlight);
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+            .meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ titulo }}</h1>
+        <div class="meta">
+            <span>📺 {{ canal }}</span>
+            <span>⏱️ {{ duracion }}</span>
+            <span>📅 {{ fecha }}</span>
+            <span>🔗 <a href="{{ url }}" target="_blank">Ver video</a></span>
+        </div>
+    </header>
+
+    <section class="idea-principal">
+        <h2>💎 Idea Principal</h2>
+        <p>{{ idea_principal }}</p>
+    </section>
+
+    <section class="puntos">
+        <h2>📋 Puntos Clave</h2>
+        <ul>
+            {% for punto in puntos_clave %}
+            <li>
+                <span class="punto-text">{{ punto }}</span>
+                <button class="expand-btn" onclick="expandPunto(this, '{{ punto|e }}')">+ más</button>
+                <div class="expansion"></div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% if puntos_clave|length >= 2 %}
+        <button class="map-btn" onclick="showConceptMap()">🗺️ Ver mapa conceptual</button>
+        <div class="concept-map-overlay" id="mapOverlay" onclick="hideConceptMap()"></div>
+        <div class="concept-map" id="conceptMap">
+            <button class="map-close" onclick="hideConceptMap()">×</button>
+            <div class="map-title">🗺️ Mapa Conceptual</div>
+            <svg id="mapSvg"></svg>
+            <div class="map-legend">
+                <span><div class="legend-dot concepto"></div> Concepto</span>
+                <span><div class="legend-dot accion"></div> Acción</span>
+                <span><div class="legend-dot herramienta"></div> Herramienta</span>
+                <span style="margin-left: auto; opacity: 0.7;">Tamaño = importancia | Grosor = fuerza de relación</span>
+            </div>
+            <div class="map-tooltip" id="mapTooltip"></div>
+        </div>
+        {% endif %}
+    </section>
+
+    {% if codigo_comandos and codigo_comandos|length > 0 %}
+    <section class="codigo">
+        <h2>🛠️ Código y Comandos</h2>
+        <ul>
+            {% for cmd in codigo_comandos %}
+            <li><code>{{ cmd }}</code></li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    {% if recursos_mencionados and recursos_mencionados|length > 0 %}
+    <section class="recursos">
+        <h2>📚 Recursos Mencionados</h2>
+        <ul>
+            {% for recurso in recursos_mencionados %}
+            <li>{{ recurso }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    {% if preguntas_profundizar and preguntas_profundizar|length > 0 %}
+    <section class="preguntas">
+        <h2>❓ Para Profundizar</h2>
+        <ul>
+            {% for pregunta in preguntas_profundizar %}
+            <li>{{ pregunta }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    {% if glosario and glosario|length > 0 %}
+    <section class="glosario">
+        <h2>📖 Glosario</h2>
+        <dl>
+            {% for term, definition in glosario.items() %}
+            <dt>{{ term }}</dt>
+            <dd>{{ definition }}</dd>
+            {% endfor %}
+        </dl>
+    </section>
+    {% endif %}
+
+    <footer>
+        Generado con <a href="#">⛏️ VideoMine</a> - Metodología minerOS
+    </footer>
+
+    <script>
+        const API = 'http://localhost:5555/api';
+        const VIDEO_ID = '{{ video_id }}';
+
+        // Cache en localStorage
+        function getCacheKey(punto) {
+            return `vm_expand_${VIDEO_ID}_${punto.substring(0, 50)}`;
+        }
+
+        function getFromCache(punto) {
+            const key = getCacheKey(punto);
+            const cached = localStorage.getItem(key);
+            if (cached) {
+                try {
+                    return JSON.parse(cached);
+                } catch {
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        function saveToCache(punto, expansion) {
+            const key = getCacheKey(punto);
+            localStorage.setItem(key, JSON.stringify({
+                expansion,
+                timestamp: Date.now()
+            }));
+        }
+
+        async function expandPunto(btn, punto) {
+            const li = btn.closest('li');
+            const expansionDiv = li.querySelector('.expansion');
+
+            // Toggle si ya está expandido
+            if (expansionDiv.classList.contains('show')) {
+                expansionDiv.classList.remove('show');
+                btn.textContent = '+ más';
+                return;
+            }
+
+            // Verificar cache
+            const cached = getFromCache(punto);
+            if (cached) {
+                showExpansion(expansionDiv, cached.expansion, btn);
+                return;
+            }
+
+            // Llamar a la API
+            btn.disabled = true;
+            btn.classList.add('loading');
+            btn.textContent = 'pensando';
+
+            try {
+                const res = await fetch(`${API}/expand`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        video_id: VIDEO_ID,
+                        punto: punto
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.expansion) {
+                    saveToCache(punto, data.expansion);
+                    showExpansion(expansionDiv, data.expansion, btn);
+                } else {
+                    expansionDiv.innerHTML = '<p style="color:#ff6b6b">Error: ' + (data.error || 'No se pudo expandir') + '</p>';
+                    expansionDiv.classList.add('show');
+                    btn.textContent = '+ más';
+                }
+            } catch (err) {
+                expansionDiv.innerHTML = '<p style="color:#ff6b6b">Error de conexión. ¿Está el servidor activo?</p>';
+                expansionDiv.classList.add('show');
+                btn.textContent = '+ más';
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
+        }
+
+        function showExpansion(div, text, btn) {
+            // Convertir saltos de línea en párrafos
+            const paragraphs = text.split('\n\n').filter(p => p.trim());
+            div.innerHTML = paragraphs.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+            div.classList.add('show');
+            btn.textContent = '− menos';
+        }
+
+        // === MAPA CONCEPTUAL ===
+        let mapData = null;
+        let mapCacheKey = `vm_map_${VIDEO_ID}`;
+
+        function getMapFromCache() {
+            const cached = localStorage.getItem(mapCacheKey);
+            if (cached) {
+                try {
+                    return JSON.parse(cached);
+                } catch {
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        function saveMapToCache(data) {
+            localStorage.setItem(mapCacheKey, JSON.stringify(data));
+        }
+
+        async function showConceptMap() {
+            const mapContainer = document.getElementById('conceptMap');
+            const btn = document.querySelector('.map-btn');
+
+            // Toggle si ya está visible
+            if (mapContainer.classList.contains('show')) {
+                mapContainer.classList.remove('show');
+                return;
+            }
+
+            // Verificar cache
+            mapData = getMapFromCache();
+            if (mapData && mapData.nodes) {
+                renderMap(mapData);
+                mapContainer.classList.add('show');
+                document.getElementById('mapOverlay').classList.add('show');
+                document.body.style.overflow = 'hidden';
+                return;
+            }
+
+            // Cargar desde API
+            btn.disabled = true;
+            btn.textContent = '🗺️ Generando mapa...';
+
+            try {
+                const res = await fetch(`${API}/concept-map/${VIDEO_ID}`);
+                const data = await res.json();
+
+                if (data.nodes && data.edges) {
+                    mapData = data;
+                    saveMapToCache(data);
+                    renderMap(data);
+                    mapContainer.classList.add('show');
+                    document.getElementById('mapOverlay').classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    alert(data.error || 'No se pudo generar el mapa');
+                }
+            } catch (err) {
+                alert('Error de conexión');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🗺️ Ver mapa conceptual';
+            }
+        }
+
+        function hideConceptMap() {
+            document.getElementById('conceptMap').classList.remove('show');
+            document.getElementById('mapOverlay').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Cerrar con tecla Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') hideConceptMap();
+        });
+
+        function renderMap(data) {
+            const svg = document.getElementById('mapSvg');
+            const width = svg.clientWidth || 800;
+            const height = 400;
+
+            // Limpiar SVG
+            svg.innerHTML = '';
+            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+            const nodes = data.nodes || [];
+            const edges = data.edges || [];
+            const clusters = data.clusters || [];
+
+            // Calcular posiciones en círculo
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) * 0.32;
+
+            nodes.forEach((node, i) => {
+                const angle = (2 * Math.PI * i / nodes.length) - Math.PI / 2;
+                node.x = centerX + radius * Math.cos(angle);
+                node.y = centerY + radius * Math.sin(angle);
+            });
+
+            // Dibujar clusters primero (fondo)
+            clusters.forEach(cluster => {
+                if (!cluster.nodos || cluster.nodos.length < 2) return;
+
+                const clusterNodes = cluster.nodos.map(id => nodes.find(n => n.id === id)).filter(Boolean);
+                if (clusterNodes.length < 2) return;
+
+                // Calcular bounding box del cluster
+                const xs = clusterNodes.map(n => n.x);
+                const ys = clusterNodes.map(n => n.y);
+                const padding = 50;
+                const minX = Math.min(...xs) - padding;
+                const maxX = Math.max(...xs) + padding;
+                const minY = Math.min(...ys) - padding;
+                const maxY = Math.max(...ys) + padding;
+
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', minX);
+                rect.setAttribute('y', minY);
+                rect.setAttribute('width', maxX - minX);
+                rect.setAttribute('height', maxY - minY);
+                rect.setAttribute('rx', 15);
+                rect.setAttribute('class', 'cluster-bg');
+                svg.appendChild(rect);
+
+                // Nombre del cluster
+                if (cluster.nombre) {
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', minX + 10);
+                    text.setAttribute('y', minY + 15);
+                    text.setAttribute('fill', 'var(--muted)');
+                    text.setAttribute('font-size', '9');
+                    text.textContent = cluster.nombre;
+                    svg.appendChild(text);
+                }
+            });
+
+            // Dibujar edges
+            edges.forEach(edge => {
+                const fromNode = nodes.find(n => n.id === edge.from);
+                const toNode = nodes.find(n => n.id === edge.to);
+                if (!fromNode || !toNode) return;
+
+                const fuerza = edge.fuerza || 2;
+
+                // Línea
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', fromNode.x);
+                line.setAttribute('y1', fromNode.y);
+                line.setAttribute('x2', toNode.x);
+                line.setAttribute('y2', toNode.y);
+                line.setAttribute('class', `edge fuerza-${fuerza}`);
+                svg.appendChild(line);
+
+                // Label en el medio
+                if (edge.label) {
+                    const midX = (fromNode.x + toNode.x) / 2;
+                    const midY = (fromNode.y + toNode.y) / 2;
+
+                    // Fondo para legibilidad
+                    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    const textLen = edge.label.length * 5;
+                    bg.setAttribute('x', midX - textLen/2 - 3);
+                    bg.setAttribute('y', midY - 12);
+                    bg.setAttribute('width', textLen + 6);
+                    bg.setAttribute('height', 14);
+                    bg.setAttribute('fill', 'var(--card)');
+                    bg.setAttribute('rx', 3);
+                    svg.appendChild(bg);
+
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', midX);
+                    text.setAttribute('y', midY - 2);
+                    text.setAttribute('class', 'edge-label');
+                    text.textContent = edge.label;
+                    svg.appendChild(text);
+                }
+            });
+
+            // Dibujar nodos
+            nodes.forEach(node => {
+                const tipo = node.tipo || 'default';
+                const importancia = node.importancia || 1;
+                const nodeRadius = importancia === 3 ? 38 : importancia === 2 ? 32 : 26;
+
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.setAttribute('class', `node tipo-${tipo} importancia-${importancia}`);
+                g.setAttribute('transform', `translate(${node.x}, ${node.y})`);
+
+                // Círculo
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('r', nodeRadius);
+                g.appendChild(circle);
+
+                // Texto (dividido en líneas si es largo)
+                const label = node.label || `Punto ${node.id + 1}`;
+                const words = label.split(' ');
+                let lines = [];
+                let currentLine = '';
+                const maxChars = importancia === 3 ? 14 : 10;
+
+                words.forEach(word => {
+                    if ((currentLine + ' ' + word).length <= maxChars) {
+                        currentLine = currentLine ? currentLine + ' ' + word : word;
+                    } else {
+                        if (currentLine) lines.push(currentLine);
+                        currentLine = word;
+                    }
+                });
+                if (currentLine) lines.push(currentLine);
+                lines = lines.slice(0, 3);
+
+                lines.forEach((line, i) => {
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('y', (i - (lines.length - 1) / 2) * 11);
+                    text.textContent = line;
+                    g.appendChild(text);
+                });
+
+                // Tooltip en hover
+                g.addEventListener('mouseenter', (e) => {
+                    const tooltip = document.getElementById('mapTooltip');
+                    const tipoEmoji = tipo === 'concepto' ? '💡' : tipo === 'accion' ? '⚡' : tipo === 'herramienta' ? '🔧' : '📌';
+                    tooltip.innerHTML = `<strong>${tipoEmoji} ${label}</strong><br><small>${node.full || ''}</small>`;
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = (node.x + nodeRadius + 15) + 'px';
+                    tooltip.style.top = (node.y - 20) + 'px';
+                });
+
+                g.addEventListener('mouseleave', () => {
+                    document.getElementById('mapTooltip').style.display = 'none';
+                });
+
+                svg.appendChild(g);
+            });
+        }
+    </script>
+</body>
+</html>

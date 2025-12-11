@@ -1,0 +1,4 @@
+#!/bin/bash
+# ⛏️ VideoMine - wrapper script
+export PATH="/Users/carlos/Library/Python/3.9/bin:$PATH"
+python3 "$(dirname "$0")/videomine.py" "$@"

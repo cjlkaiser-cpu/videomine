@@ -1,0 +1,7 @@
+# ⛏️ VideoMine - Dependencies
+flask
+flask-cors
+jinja2
+yt-dlp
+openai-whisper
+anthropic

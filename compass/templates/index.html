@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⛏️ VideoMine - Vault</title>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --card: #16213e;
+            --accent: #0f3460;
+            --highlight: #ffa500;  /* Dorado minerOS */
+            --text: #eaeaea;
+            --muted: #8892a0;
+            --danger: #dc3545;
+            --success: #28a745;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        header h1 span { color: var(--highlight); }
+        .stats { color: var(--muted); font-size: 0.9rem; }
+        .tagline { color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; }
+
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed var(--accent);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--highlight);
+            background: rgba(255, 165, 0, 0.1);
+        }
+
+        .drop-zone h3 { margin-bottom: 0.5rem; }
+        .drop-zone p { color: var(--muted); font-size: 0.9rem; }
+
+        .url-input {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .url-input input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--card);
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .url-input input:focus { outline: 2px solid var(--highlight); }
+
+        .motor-select {
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--accent);
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--highlight);
+            color: #1a1a2e;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn:hover { filter: brightness(1.1); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Progress */
+        .progress-container {
+            display: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-container.active { display: block; }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--card);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--highlight), #ffcc00);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        /* Video Grid */
+        .video-grid { display: grid; gap: 1rem; }
+
+        .video-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1.2rem;
+            display: flex;
+            gap: 1rem;
+            border-left: 4px solid transparent;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .video-card:hover {
+            border-left-color: var(--highlight);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .video-link {
+            display: flex;
+            gap: 1rem;
+            flex: 1;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .video-thumb {
+            width: 160px;
+            height: 90px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .video-info { flex: 1; min-width: 0; }
+        .video-info h2 {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .video-meta {
+            display: flex;
+            gap: 1rem;
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .video-idea {
+            font-size: 0.9rem;
+            color: var(--muted);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Dropdown */
+        .dropdown { position: relative; }
+
+        .dropdown-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 0.5rem;
+            font-size: 1.2rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .dropdown-btn:hover { background: var(--accent); color: var(--text); }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: var(--card);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            min-width: 180px;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .dropdown:hover .dropdown-menu { display: block; }
+
+        .dropdown-menu a,
+        .dropdown-menu button {
+            display: block;
+            width: 100%;
+            padding: 0.7rem 1rem;
+            text-align: left;
+            text-decoration: none;
+            color: var(--text);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .dropdown-menu a:hover,
+        .dropdown-menu button:hover { background: var(--accent); }
+
+        .dropdown-menu .delete-btn {
+            color: var(--danger);
+            border-top: 1px solid var(--accent);
+        }
+
+        .dropdown-menu .delete-btn:hover { background: var(--danger); color: white; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 { margin-bottom: 1rem; }
+
+        .modal-content textarea {
+            width: 100%;
+            height: 200px;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-secondary {
+            background: var(--accent);
+            color: var(--text);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: var(--text);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .toast.show { display: block; animation: fadeIn 0.3s; }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        .no-videos {
+            text-align: center;
+            padding: 3rem;
+            color: var(--muted);
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.8rem;
+            padding: 2rem 1rem;
+            margin-top: 2rem;
+        }
+
+        .server-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            background: var(--success);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+
+        .server-badge.offline { background: var(--danger); }
+
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            .video-link { flex-direction: column; }
+            .video-thumb { width: 100%; height: auto; aspect-ratio: 16/9; }
+            .url-input { flex-direction: column; }
+        }
+
+        /* Search Bar */
+        .search-bar {
+            position: relative;
+            margin-top: 1rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--card);
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .search-bar input:focus {
+            outline: 2px solid var(--highlight);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border-radius: 0 0 8px 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 200;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .search-results.active { display: block; }
+
+        .search-result-item {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--accent);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-result-item:hover { background: var(--accent); }
+
+        .search-result-item h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .search-result-item .match-info {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .search-result-item .match-info span {
+            background: var(--highlight);
+            color: #1a1a2e;
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+            margin-right: 0.3rem;
+        }
+
+        /* Study Mode Modal */
+        .study-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .study-modal.active { display: block; }
+
+        .study-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--card);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .study-header h2 {
+            font-size: 1.1rem;
+            max-width: 70%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .study-close {
+            background: var(--highlight);
+            border: none;
+            color: #1a1a2e;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .study-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            padding: 1rem;
+            height: calc(100vh - 70px);
+        }
+
+        .study-video {
+            background: black;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .study-video iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .study-notes {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .study-notes h3 {
+            color: var(--highlight);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .study-notes ul {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .study-notes li {
+            padding: 0.4rem 0;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .study-notes li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--highlight);
+        }
+
+        @media (max-width: 900px) {
+            .study-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .study-video {
+                aspect-ratio: 16/9;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⛏️ Video<span>Mine</span> <span class="server-badge" id="serverBadge">offline</span></h1>
+        <p class="stats">🏛️ Vault: <span id="videoCount">{{ videos|length }}</span> nugget{% if videos|length != 1 %}s{% endif %}</p>
+        <p class="tagline">🔦 Tunnel → ⛏️ Pickaxe → 💎 Gemcutter → 🏛️ Vault</p>
+        <!-- Barra de búsqueda -->
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Buscar en el Vault..." autocomplete="off">
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </header>
+
+    <!-- Drop Zone -->
+    <div class="drop-zone" id="dropZone">
+        <h3>🔦 Arrastra una URL de YouTube aquí</h3>
+        <p>o pega/escribe la URL abajo para extraer nuggets</p>
+        <div class="url-input">
+            <input type="text" id="urlInput" placeholder="https://www.youtube.com/watch?v=...">
+            <select class="motor-select" id="motorSelect">
+                <option value="ollama">💎 Ollama (local)</option>
+                <option value="claude-code">💎 Claude Code (auto)</option>
+                <option value="manual">📝 Manual (copiar/pegar)</option>
+            </select>
+            <button class="btn" id="addBtn">⛏️ Minar</button>
+        </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-container" id="progressContainer">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p class="progress-text" id="progressText">Minando...</p>
+    </div>
+
+    <!-- Video Grid -->
+    <main class="video-grid" id="videoGrid">
+        {% if videos %}
+            {% for video in videos|reverse %}
+            <div class="video-card" data-id="{{ video.id }}">
+                <a href="{{ video.file }}" class="video-link">
+                    {% if video.thumbnail %}
+                    <img src="{{ video.thumbnail }}" alt="{{ video.title }}" class="video-thumb" loading="lazy">
+                    {% endif %}
+                    <div class="video-info">
+                        <h2>{{ video.title }}</h2>
+                        <div class="video-meta">
+                            <span>📺 {{ video.channel }}</span>
+                            <span>⏱️ {{ video.duration }}</span>
+                            <span>📅 {{ video.date }}</span>
+                        </div>
+                        <p class="video-idea">💎 {{ video.idea_principal }}</p>
+                    </div>
+                </a>
+                <div class="dropdown">
+                    <button class="dropdown-btn">⋮</button>
+                    <div class="dropdown-menu">
+                        <button onclick="openStudyMode('{{ video.id }}', '{{ video.url }}')">🎯 Modo Estudio</button>
+                        <a href="{{ video.url }}" target="_blank">▶ Ver en YouTube</a>
+                        <a href="{{ video.file }}">💎 Ver nugget</a>
+                        <button onclick="showTranscript('{{ video.id }}')">📜 Ver transcripción</button>
+                        <button onclick="exportHTML('{{ video.id }}')">🖨 Exportar HTML</button>
+                        <button onclick="exportAnki('{{ video.id }}')">🃏 Exportar Anki</button>
+                        <button onclick="exportMD('{{ video.id }}')">📝 Exportar MD</button>
+                        <button class="delete-btn" onclick="deleteVideo('{{ video.id }}')">🗑 Eliminar</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-videos" id="noVideos">
+                <p>🏛️ El Vault está vacío.</p>
+                <p>Arrastra una URL o usa el campo de arriba para minar tu primer nugget</p>
+            </div>
+        {% endif %}
+    </main>
+
+    <!-- Modal de Transcripción -->
+    <div class="modal" id="transcriptModal">
+        <div class="modal-content">
+            <h3 id="transcriptTitle">📜 Transcripción</h3>
+            <div style="margin-bottom:1rem">
+                <button class="btn btn-secondary" onclick="copyFullTranscript()">📋 Copiar</button>
+                <button class="btn" onclick="translateTranscript()" id="translateBtn">🌐 Traducir al español</button>
+            </div>
+            <textarea id="fullTranscriptArea" readonly style="height:400px" placeholder="Cargando..."></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeTranscriptModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Claude Code -->
+    <div class="modal" id="manualModal">
+        <div class="modal-content">
+            <h3>📝 Resumen con Claude Code</h3>
+            <p style="margin-bottom:1rem;color:var(--muted)">
+                Copia la transcripción, pídele a Claude que la resuma, y pega el JSON aquí:
+            </p>
+            <textarea id="transcriptArea" readonly placeholder="Transcripción..."></textarea>
+            <button class="btn btn-secondary" onclick="copyTranscript()" style="margin-bottom:1rem">📋 Copiar transcripción</button>
+            <p style="margin-bottom:0.5rem;color:var(--muted)">Pega el JSON del resumen:</p>
+            <textarea id="summaryInput" placeholder='{"idea_principal": "...", "puntos_clave": [...], ...}'></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button class="btn" onclick="submitSummary()">💎 Generar nugget</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Modo Estudio -->
+    <div class="study-modal" id="studyModal">
+        <div class="study-header">
+            <h2 id="studyTitle">🎯 Modo Estudio</h2>
+            <button class="study-close" onclick="closeStudyMode()">✕ Cerrar</button>
+        </div>
+        <div class="study-container">
+            <div class="study-video">
+                <iframe id="studyVideo" src="" allowfullscreen></iframe>
+            </div>
+            <div class="study-notes" id="studyNotes">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <footer>
+        ⛏️ VideoMine - Metodología minerOS<br>
+        🔦 Tunnel → ⛏️ Pickaxe → 💎 Gemcutter → 🏛️ Vault → 🧭 Compass
+    </footer>
+
+    <script>
+        const API = 'http://localhost:5555/api';
+        let currentVideoId = null;
+        let serverOnline = false;
+
+        // Check server status
+        async function checkServer() {
+            try {
+                const res = await fetch(`${API}/videos`, {method: 'GET'});
+                serverOnline = res.ok;
+            } catch {
+                serverOnline = false;
+            }
+            const badge = document.getElementById('serverBadge');
+            badge.textContent = serverOnline ? 'online' : 'offline';
+            badge.classList.toggle('offline', !serverOnline);
+        }
+
+        // Drop zone
+        const dropZone = document.getElementById('dropZone');
+        const urlInput = document.getElementById('urlInput');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const text = e.dataTransfer.getData('text');
+            if (text && (text.includes('youtube.com') || text.includes('youtu.be'))) {
+                urlInput.value = text;
+                addVideo();
+            }
+        });
+
+        // Add video
+        document.getElementById('addBtn').addEventListener('click', addVideo);
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addVideo();
+        });
+
+        async function addVideo() {
+            const url = urlInput.value.trim();
+            const motor = document.getElementById('motorSelect').value;
+
+            if (!url) {
+                showToast('Ingresa una URL', 'error');
+                return;
+            }
+
+            if (!serverOnline) {
+                showToast('Servidor offline. Ejecuta: python videomine.py --server', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API}/add`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({url, motor})
+                });
+
+                const data = await res.json();
+                if (data.task_id) {
+                    urlInput.value = '';
+                    pollProgress(data.task_id);
+                }
+            } catch (err) {
+                showToast('Error: ' + err.message, 'error');
+            }
+        }
+
+        // Poll progress
+        async function pollProgress(taskId) {
+            const container = document.getElementById('progressContainer');
+            const fill = document.getElementById('progressFill');
+            const text = document.getElementById('progressText');
+
+            container.classList.add('active');
+
+            const poll = async () => {
+                try {
+                    const res = await fetch(`${API}/progress/${taskId}`);
+                    const updates = await res.json();
+
+                    for (const update of updates) {
+                        fill.style.width = update.progress + '%';
+                        text.textContent = update.msg;
+
+                        if (update.needs_summary) {
+                            container.classList.remove('active');
+                            currentVideoId = update.video_id;
+                            document.getElementById('transcriptArea').value = update.transcript;
+                            document.getElementById('manualModal').classList.add('active');
+                            return;
+                        }
+
+                        if (update.step === 'done') {
+                            container.classList.remove('active');
+                            showToast('💎 ' + update.title, 'success');
+                            setTimeout(() => location.reload(), 1000);
+                            return;
+                        }
+
+                        if (update.step === 'error') {
+                            container.classList.remove('active');
+                            showToast('❌ ' + update.msg, 'error');
+                            return;
+                        }
+                    }
+
+                    setTimeout(poll, 500);
+                } catch {
+                    setTimeout(poll, 1000);
+                }
+            };
+
+            poll();
+        }
+
+        // Manual mode
+        function copyTranscript() {
+            const textarea = document.getElementById('transcriptArea');
+            navigator.clipboard.writeText(textarea.value);
+            showToast('Transcripción copiada');
+        }
+
+        function closeModal() {
+            document.getElementById('manualModal').classList.remove('active');
+            currentVideoId = null;
+        }
+
+        async function submitSummary() {
+            const summaryText = document.getElementById('summaryInput').value.trim();
+            if (!summaryText || !currentVideoId) {
+                showToast('Pega el JSON del resumen', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API}/finish`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        video_id: currentVideoId,
+                        summary: summaryText
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    closeModal();
+                    showToast('💎 Nugget generado', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast('Error: ' + data.error, 'error');
+                }
+            } catch (err) {
+                showToast('Error: ' + err.message, 'error');
+            }
+        }
+
+        // Delete video
+        async function deleteVideo(id) {
+            if (!confirm('¿Eliminar este nugget?')) return;
+
+            if (serverOnline) {
+                try {
+                    await fetch(`${API}/delete/${id}`, {method: 'DELETE'});
+                    showToast('Nugget eliminado', 'success');
+                    setTimeout(() => location.reload(), 500);
+                } catch {
+                    showToast('Error al eliminar', 'error');
+                }
+            } else {
+                const cmd = `python videomine.py --delete ${id}`;
+                navigator.clipboard.writeText(cmd);
+                showToast('Comando copiado: ' + cmd);
+            }
+        }
+
+        // Export MD (descarga directa desde servidor)
+        function exportMD(id) {
+            if (serverOnline) {
+                // Descarga directa - el servidor envía el archivo con headers apropiados
+                window.location.href = `${API}/export/${id}`;
+                showToast('📝 Markdown descargado');
+            } else {
+                showToast('Servidor offline', 'error');
+            }
+        }
+
+        // Transcript modal
+        let currentTranscript = '';
+
+        async function showTranscript(id) {
+            if (!serverOnline) {
+                showToast('Servidor offline', 'error');
+                return;
+            }
+
+            const modal = document.getElementById('transcriptModal');
+            const textarea = document.getElementById('fullTranscriptArea');
+            const title = document.getElementById('transcriptTitle');
+            const btn = document.getElementById('translateBtn');
+
+            textarea.value = 'Cargando...';
+            btn.disabled = false;
+            btn.textContent = '🌐 Traducir al español';
+            modal.classList.add('active');
+
+            try {
+                const res = await fetch(`${API}/transcript/${id}`);
+                const data = await res.json();
+
+                if (data.transcript) {
+                    currentTranscript = data.transcript;
+                    textarea.value = data.transcript;
+                    title.textContent = `📜 ${data.title}`;
+                } else {
+                    textarea.value = 'No hay transcripción guardada para este nugget.';
+                }
+            } catch (err) {
+                textarea.value = 'Error al cargar: ' + err.message;
+            }
+        }
+
+        function closeTranscriptModal() {
+            document.getElementById('transcriptModal').classList.remove('active');
+            currentTranscript = '';
+        }
+
+        function copyFullTranscript() {
+            const textarea = document.getElementById('fullTranscriptArea');
+            navigator.clipboard.writeText(textarea.value);
+            showToast('Transcripción copiada');
+        }
+
+        async function translateTranscript() {
+            if (!currentTranscript) {
+                showToast('No hay transcripción', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('translateBtn');
+            const textarea = document.getElementById('fullTranscriptArea');
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Traduciendo...';
+            showToast('Traduciendo con Ollama...');
+
+            try {
+                const res = await fetch(`${API}/translate`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text: currentTranscript})
+                });
+
+                const data = await res.json();
+
+                if (data.translation) {
+                    textarea.value = data.translation;
+                    btn.textContent = '✅ Traducido';
+                    showToast('Traducción completada', 'success');
+                } else {
+                    throw new Error(data.error || 'Error desconocido');
+                }
+            } catch (err) {
+                btn.textContent = '❌ Error';
+                showToast('Error: ' + err.message, 'error');
+            }
+        }
+
+        // Toast
+        function showToast(msg, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            const query = e.target.value.trim();
+
+            if (query.length < 2) {
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`${API}/search?q=${encodeURIComponent(query)}`);
+                    const data = await res.json();
+
+                    if (data.results.length === 0) {
+                        searchResults.innerHTML = '<div class="search-result-item"><p style="color:var(--muted)">Sin resultados</p></div>';
+                    } else {
+                        searchResults.innerHTML = data.results.map(r => `
+                            <div class="search-result-item" onclick="window.location.href='${r.file}'">
+                                <h4>${r.title}</h4>
+                                <div class="match-info">
+                                    ${r.matches.map(m => `<span>${m}</span>`).join('')}
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                    searchResults.classList.add('active');
+                } catch (err) {
+                    console.error('Search error:', err);
+                }
+            }, 300);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-bar')) {
+                searchResults.classList.remove('active');
+            }
+        });
+
+        // Export HTML imprimible (descarga directa desde servidor)
+        function exportHTML(id) {
+            if (!serverOnline) {
+                showToast('Servidor offline', 'error');
+                return;
+            }
+            window.location.href = `${API}/export-html/${id}`;
+            showToast('🖨 HTML descargado', 'success');
+        }
+
+        // Export Anki (descarga directa desde servidor)
+        function exportAnki(id) {
+            if (!serverOnline) {
+                showToast('Servidor offline', 'error');
+                return;
+            }
+            // Descarga directa - si no hay cards el servidor devuelve 404
+            window.location.href = `${API}/export-anki/${id}`;
+            showToast('🃏 Flashcards exportadas', 'success');
+        }
+
+        // Study Mode
+        let studyVideoId = null;
+
+        async function openStudyMode(id, youtubeUrl) {
+            if (!serverOnline) {
+                showToast('Servidor offline', 'error');
+                return;
+            }
+
+            studyVideoId = id;
+
+            let videoId = '';
+            if (youtubeUrl.includes('youtu.be/')) {
+                videoId = youtubeUrl.split('youtu.be/')[1].split('?')[0];
+            } else {
+                const match = youtubeUrl.match(/v=([^&]+)/);
+                videoId = match ? match[1] : '';
+            }
+
+            document.getElementById('studyVideo').src = `https://www.youtube.com/embed/${videoId}`;
+
+            try {
+                const res = await fetch(`${API}/videos`);
+                const videos = await res.json();
+                const video = videos.find(v => v.id === id);
+
+                if (video) {
+                    document.getElementById('studyTitle').textContent = video.title;
+
+                    let notesHtml = `<h3>💎 Idea Principal</h3><p>${video.idea_principal || 'N/A'}</p>`;
+
+                    if (video.puntos_clave && video.puntos_clave.length > 0) {
+                        notesHtml += '<h3>📋 Puntos Clave</h3><ul>';
+                        video.puntos_clave.forEach(p => notesHtml += `<li>${p}</li>`);
+                        notesHtml += '</ul>';
+                    }
+
+                    if (video.codigo_comandos && video.codigo_comandos.length > 0) {
+                        notesHtml += '<h3>🛠 Código</h3><ul>';
+                        video.codigo_comandos.forEach(c => notesHtml += `<li><code>${c}</code></li>`);
+                        notesHtml += '</ul>';
+                    }
+
+                    if (video.glosario && Object.keys(video.glosario).length > 0) {
+                        notesHtml += '<h3>📖 Glosario</h3><ul>';
+                        for (const [term, def] of Object.entries(video.glosario)) {
+                            notesHtml += `<li><strong>${term}:</strong> ${def}</li>`;
+                        }
+                        notesHtml += '</ul>';
+                    }
+
+                    document.getElementById('studyNotes').innerHTML = notesHtml;
+                }
+            } catch (err) {
+                console.error('Error loading study notes:', err);
+            }
+
+            document.getElementById('studyModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeStudyMode() {
+            document.getElementById('studyModal').classList.remove('active');
+            document.getElementById('studyVideo').src = '';
+            document.body.style.overflow = '';
+            studyVideoId = null;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('studyModal').classList.contains('active')) {
+                closeStudyMode();
+            }
+        });
+
+        // Init
+        checkServer();
+        setInterval(checkServer, 5000);
+    </script>
+</body>
+</html>
