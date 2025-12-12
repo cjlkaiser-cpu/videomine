@@ -2,6 +2,34 @@
 
 Todos los cambios notables en VideoMine.
 
+## [0.5.0] - 2025-12-12 "Compass UI"
+
+### Nuevas Funciones
+
+- **Rediseño visual estilo Physics Sound Lab**:
+  - Nueva paleta de colores: grays oscuros (#030712, #111827) con amber (#fbbf24)
+  - Fuente Inter de Google Fonts (pesos 300-700)
+  - Header sticky con backdrop-blur
+  - Cards con borde gradiente dorado animado en hover
+  - Efecto translateY + sombra dorada en hover
+
+- **Mini-canvas animados en header**:
+  - Péndulo oscilante (44x44px) junto al logo - física real con ecuación diferencial
+  - Sistema solar mini (24x24px) en botón Graph - 3 planetas orbitando
+  - Figura de Lissajous (24x24px) en botón Lab - patrón 3:2 con trail
+  - Soporte para pantallas Retina (devicePixelRatio)
+
+### Mejoras
+
+- Header reorganizado: logo a la izquierda, acciones a la derecha
+- Título más grande (1.8rem) con tipografía ligera
+- Grid de videos más compacto (minmax 280px)
+- Thumbnails de video reducidos (max-height 140px)
+- Dropdowns, modales y toasts refinados
+- Mejor responsive para móviles
+
+---
+
 ## [0.4.0] - 2024-12-11 "Prospector"
 
 ### Nuevas Funciones
