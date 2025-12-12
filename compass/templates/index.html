@@ -8,7 +8,6 @@
     <style>
         :root {
             --bg: #030712;
-            --bg-secondary: #0a0f1a;
             --card: #111827;
             --card-hover: #1f2937;
             --accent: #374151;
@@ -863,7 +862,25 @@
     </footer>
 
     <script>
-        const API = 'http://localhost:5555/api';
+        // ========== Configuración ==========
+        const CONFIG = {
+            API_URL: 'http://localhost:5555/api',
+            CHECK_INTERVAL: 5000,
+            SEARCH_DEBOUNCE: 300,
+            TOAST_DURATION: 3000
+        };
+
+        // ========== Estado global ==========
+        const state = {
+            serverOnline: false,
+            currentVideoId: null,
+            currentTranscript: '',
+            studyVideoId: null,
+            searchTimeout: null
+        };
+
+        // Alias para compatibilidad
+        const API = CONFIG.API_URL;
         let currentVideoId = null;
         let serverOnline = false;
 
@@ -1049,16 +1066,18 @@
             }
         }
 
-        // Export MD (descarga directa desde servidor)
-        function exportMD(id) {
-            if (serverOnline) {
-                // Descarga directa - el servidor envía el archivo con headers apropiados
-                window.location.href = `${API}/export/${id}`;
-                showToast('📝 Markdown descargado');
-            } else {
+        // ========== Export helpers ==========
+        function downloadFromServer(endpoint, successMsg) {
+            if (!serverOnline) {
                 showToast('Servidor offline', 'error');
+                return false;
             }
+            window.location.href = `${API}/${endpoint}`;
+            showToast(successMsg, 'success');
+            return true;
         }
+
+        const exportMD = (id) => downloadFromServer(`export/${id}`, '📝 Markdown descargado');
 
         // Transcript modal
         let currentTranscript = '';
@@ -1146,7 +1165,7 @@
             const toast = document.getElementById('toast');
             toast.textContent = msg;
             toast.className = 'toast show ' + type;
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            setTimeout(() => toast.classList.remove('show'), CONFIG.TOAST_DURATION);
         }
 
         // Search functionality
@@ -1184,7 +1203,7 @@
                 } catch (err) {
                     console.error('Search error:', err);
                 }
-            }, 300);
+            }, CONFIG.SEARCH_DEBOUNCE);
         });
 
         document.addEventListener('click', (e) => {
@@ -1193,26 +1212,8 @@
             }
         });
 
-        // Export HTML imprimible (descarga directa desde servidor)
-        function exportHTML(id) {
-            if (!serverOnline) {
-                showToast('Servidor offline', 'error');
-                return;
-            }
-            window.location.href = `${API}/export-html/${id}`;
-            showToast('🖨 HTML descargado', 'success');
-        }
-
-        // Export Anki (descarga directa desde servidor)
-        function exportAnki(id) {
-            if (!serverOnline) {
-                showToast('Servidor offline', 'error');
-                return;
-            }
-            // Descarga directa - si no hay cards el servidor devuelve 404
-            window.location.href = `${API}/export-anki/${id}`;
-            showToast('🃏 Flashcards exportadas', 'success');
-        }
+        const exportHTML = (id) => downloadFromServer(`export-html/${id}`, '🖨 HTML descargado');
+        const exportAnki = (id) => downloadFromServer(`export-anki/${id}`, '🃏 Flashcards exportadas');
 
         // Study Mode
         let studyVideoId = null;
@@ -1290,7 +1291,7 @@
 
         // Init
         checkServer();
-        setInterval(checkServer, 5000);
+        setInterval(checkServer, CONFIG.CHECK_INTERVAL);
 
         // ========== Mini Canvas Animations ==========
         let animTime = 0;
